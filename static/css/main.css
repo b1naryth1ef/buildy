@@ -433,9 +433,9 @@ ul.sub li ul li { padding-left: 10px; }
 
 /* === Title area with middle navigation === */
 
-.titleArea { padding-top: 36px; }
+.titleArea { padding-top: 0px; }
 
-.pageTitle { float: left; padding: 35px 0 32px 0; }
+.pageTitle { float: left; padding: 15px 0 15px 0; }
 
 .middleNav { float: right; border: 1px solid #cdcdcd; margin: 29px 0; }
 .middleNav ul { }
@@ -478,12 +478,14 @@ ul.sub li ul li { padding-left: 10px; }
 .sItem > h2 a:active { background-position: 0 -124px; }
 
 .value { text-align: center; padding: 12px 20px 5px 20px; font-weight: bold; }
-.value span { display: block; margin-top: 2px; font-size: 12px; }
+.value .text { display: block; margin-top: 2px; font-size: 12px; }
 
 .changes { text-align: center; font-weight: bold; font-size: 14px; padding: 14px 18px 5px 18px; float: left; border-left: 1px solid #d5d5d5; }
 .changes .negative { background: url(../images/negArrow.png) no-repeat 0px 5px; padding-left: 22px; color: #db6464; margin-top: 4px; display: block; }
 .changes .positive { background: url(../images/posArrow.png) no-repeat 0px 6px; padding-left: 22px; color: #6daa24; margin-top: 4px; display: block; }
 .changes .zero { background: url(../images/zero.png) no-repeat 4px 6px; padding-left: 20px; color: #4e8fc6; margin-top: 4px; display: block; }
+.positivey {color: #6daa24;}
+.positivex {color: #db6464;}
 
 
 
@@ -795,9 +797,12 @@ html ul.tabs li.activeTab a { color: #2E6B9B; }
 /* Website statistics widget */
 
 .webStatsLink { color: #2e6b9b; font-size: 16px; font-weight: bold; }
-.statsPlus, .statsMinus { padding-left: 20px; }
+.statsPlus, .statsMinus, .statsPluss { padding-left: 20px; }
+.statsMinuss { padding-right: 20px;}
 .statsPlus { background: url(../images/icons/grown.png) no-repeat 0 2px; color: #599414; }
 .statsMinus { background: url(../images/icons/dropped.png) no-repeat 0 2px; color: #a73939; }
+.statsPluss { color: #599414; }
+.statsMinuss { color: #a73939; }
 
 
 /* Content statistics widget */

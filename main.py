@@ -1,88 +1,96 @@
+from flask import Flask, render_template, request, url_for, make_response, redirect, flash
 import sys, os, time
-from flask import Flask, render_template, request, url_for, make_response, redirect
-from mongoengine import *
 import bcrypt, random
+import goatfish, sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
 
-connect('buildy', username='admin', password=sys.argv[1], host='hydr0.com')
+class Project(goatfish.Model):
+    class Meta:
+        connection = sqlite3.connect("./data.db", check_same_thread = False)
+        indexes = (
+            ("pid",),
+            ("pid", "name", "desc", "url", "git", "builds", "downloads"),
+        )
+Project.initialize()
 
-class User(Document):
-    username = StringField(required=True)
-    password = StringField(required=True)
-    data = DictField()
+class Build(goatfish.Model):
+    class Meta:
+        connection = sqlite3.connect("./data.db", check_same_thread = False)
+        indexes = (
+            ("bid",),
+            ("bid", "project", "data", "built", "success"),
+        )
+Build.initialize()
 
-class Project(Document):
-    pid = IntField()
-    owner = IntField()
-    url = URLField()
-    git = StringField()
-    builds = ListField()
+# project = Project()
+# project.pid = 1
+# project.name = "SWiSH"
+# project.desc = "An improved ioquake3/Urban Terror build created by Strata (mirrored by Neek)"
+# project.url = "https://github.com/spekode/SWiSH_ioUrT"
+# project.git = "git://github.com/spekode/SWiSH_ioUrT.git"
+# project.builds = []
+# project.downloads = 0
+# project.save()
 
-class Build(Document):
-    bid = IntField()
-    owner = IntField()
-    project = IntField()
-    data = DictField()
-
-if not User.objects(username="b1naryth1ef"):
-    print 'adding'
-    u = User(username="b1naryth1ef", password='1234')
-    u.save()
-# else:
-#     for i in User.objects(username="b1naryth1ef"):
-#         i.delete()
-#     sys.exit()
+def getProjects():
+    a = []
+    for i in Project.find():
+        g, b = 0, 0
+        for x in i.builds:
+            for y in Build.find({'bid':x}):
+                if y.built:
+                    if y.success: g += 1
+                    else: b += 1
+        a.append({'pid':i.pid, 'name':i.name, 'desc':i.desc, 'buildcount':[g,b]})
+    return a
 
 @app.route('/')
-def root():
-    return "Hello world!"
+def index():
+    return actionIndex() 
 
-@app.route('/login/', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        user = User.objects(username=request.form['login'].lower())
-        if user != None:
-            if len(user) == 1:
-                if request.form['password'] == user[0].password:
-                    sid = random.randint(111111,999999)
-                    resp = make_response(render_template('login.html', win=True))
-                    sessions[user[0].username] = sid
-                    resp.set_cookie('user', user[0].username)
-                    resp.set_cookie('sessid', sid)
-                    return resp
-        return render_template('login.html', error="Bad login!")
-    else:
-        return render_template('login.html', error='')
+@app.route('/project/')
+@app.route('/project/<pid>/')
+def projectView(pid=None):
+    if pid:
+        if pid.isdigit(): return "Blah %s | %s" % (pid, action)
+        flash('The project you requested does not exsist!')
+        return redirect(url_for('index'))
+    else: return actionProjects()
 
-@app.route('/admin/')
-def adminindex():
-    return redirect(url_for('admin', action='index'))
+@app.route('/project/<pid>/builds/')
+@app.route('/project/<pid>/builds/<bid>')
+def buildView(pid=None, bid=None): pass
 
-@app.route('/admin/<action>')
-def admin(action=None):
-    if 'sessid' in request.cookies.keys():
-        s = request.cookies.get('sessid')
-        u = request.cookies.get('user')
-        if u in sessions.keys():
-            print sessions[u], s
-            if str(sessions[u]) == s:
-                if action == 'index': return actionIndex()
-                    
-    return redirect(url_for('login'))
+@app.route('/builds/')
+def buildsView():
+    return render_template('build.html', builds=[i for i in Build.find()], projects=[i for i in Project.find()])
+
+def actionProjects(): pass
 
 def actionIndex():
     data = {
-    'num_builds':100,
-    'num_projects':1245,
-    'num_users':8543,
-    'user':'B1naryth1ef'
+    'projects':getProjects()
     }
+    data.update(cached_stats)
     return render_template('index.html', data=data)
 
-@app.route('/api/<action>', methods=['GET', 'POST'])
-def api(action=None): pass
+@app.route('/api/<action>/', methods=['GET', 'POST'])
+def api(action=None):
+    if action == "gitty":
+        print request.args.keys()
 
 if __name__ == '__main__':
+    q =  [i for i in Build.find()]
+    p_count = len([i for i in Project.find()])
+    b_count = [len([i for i in q if i.success]), len([i for i in q if not i.success])]
+    b_count.append(sum(b_count))
+    d_count = sum([i.downloads for i in Project.find()])
+    cached_stats = {
+    'num_projects':p_count,
+    'num_builds':b_count,
+    'num_downloads':d_count,
+    }
     app.run(debug=True, host='0.0.0.0')
