@@ -56,6 +56,7 @@ def projectView(pid=None):
 def buildView(pid=None, bid=None, did=None): pass
 
 def runBuild(b):
+    print 'Sending build to worker...',
     c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     c.connect((random.choice(build_servers), 7660))
     c.send(json.dumps({
@@ -64,6 +65,7 @@ def runBuild(b):
         'job':b.bnum,
         }))
     c.close()
+    print 'SENT!'
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
@@ -77,6 +79,7 @@ def api(action=None):
         if len(q):
             buildinc += 1
             b = Build.create(project=q[0], bnum=buildinc, code=random.randint(1000, 9999))
+            runBuild(b)
         else:
             print 'Invalid build info!', d, q
     elif action == "buildfin":
