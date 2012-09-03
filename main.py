@@ -78,7 +78,7 @@ def api(action=None):
             buildinc += 1
             b = Build.create(project=q[0], bnum=buildinc, code=random.randint(1000, 9999))
         else:
-            print 'invalid build info!'
+            print 'invalid build info!', q, [i.repo_name for i in Project.select()]
     elif action == "buildfin":
         print request.form.keys()
     else: pass
