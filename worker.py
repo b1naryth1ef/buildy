@@ -19,13 +19,14 @@ class Job():
         self.result = None
 
     def _build(self):
+        org = os.getcwd()
         self.building = True
         try: 
             if not subprocess.Popen('git clone %s' % (self.info['git'],), shell=True).wait() == 0:
                 self.success = False
                 self.result = "Could not clone repository!"
             else:
-                os.chdir(os.path.join(os.getcwd(), self.info['dir']))
+                os.chdir(os.path.join(org, self.info['dir']))
                 for i in self.info['actions']:
                     if i['type'] == 'sh':
                         p = subprocess.Popen(i['action'], shell=True)
@@ -39,7 +40,8 @@ class Job():
                         self.success = False
                         self.result = "Could not package output!"
                     else: subprocess.Popen('mv build_%s.tar.gz %s/' % (self.bid, web_dir))
-                subprocess.Popen('cd ..; rm -rf %s' % i['dir'])
+                os.chdir(org)
+                print 'Removing dir: ', subprocess.Popen('rm -rf %s' % i['dir']).wait()
         except: 
             self.success = False
             self.result = "Unknown error in build!"
