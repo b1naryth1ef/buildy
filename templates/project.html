@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="widget">
+    <div class="title"><img src="/static/images/icons/dark/list.png" alt="" class="titleIcon" /><h6>Project: {{ p.name }}</h6></div>
+    <p>{{ p.desc }}</p>
+</div>
+<div class="widget">
+    <div class="title"><img src="/static/images/icons/dark/stats.png" alt="" class="titleIcon" /><h6>Projects</h6></div>
+    <table cellpadding="0" cellspacing="0" width="100%" class="sTable">
+        <thead>
+            <tr>
+                <td>Build #</td>
+                <td>Success/Failure</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in p.builds %}
+                <tr>
+                    <td align="center">
+                        <a href="{% if i.success %}{{ i.burl }}{% else %}#{%endif%}" title="" class="webStatsLink">{{ i.bnum }}</a>
+                    </td>
+                    <td>{% if i.success %}Finished!{% else %}Failed!{% endif %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>    
+</div>
+
+</div>
+{% endblock %}

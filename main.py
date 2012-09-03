@@ -45,16 +45,13 @@ def projectView(pid=None):
     if pid and pid.isdigit() or isinstance(pid, int):
         q = [i for i in Project.select().where(id=int(pid))]
         if len(q):
-            return "Yay!"
+            v = Obby()
+            v.stats = getStats()
+            v.title = "%s" % q[0].name
+            return render_template('project.html', p=q[0], v=v)
         else: flash('No project with ID #%s' % pid)
     else: flash('The project ID is invalid!')
     return redirect(url_for('index'))
-
-@app.route('/builds/')
-@app.route('/build/<bid>')
-@app.route('/build/p/<pid>')
-@app.route('/build/dl/<did>')
-def buildView(pid=None, bid=None, did=None): pass
 
 def runBuild(b):
     print 'Sending build to worker...',
