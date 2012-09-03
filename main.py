@@ -1,96 +1,67 @@
 from flask import Flask, render_template, request, url_for, make_response, redirect, flash
-import sys, os, time
-import bcrypt, random
-import goatfish, sqlite3
+import sys, os, time, random
+from database import Project, Build
 
 app = Flask(__name__)
 app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
+statsc = None
 
-class Project(goatfish.Model):
-    class Meta:
-        connection = sqlite3.connect("./data.db", check_same_thread = False)
-        indexes = (
-            ("pid",),
-            ("pid", "name", "desc", "url", "git", "builds", "downloads"),
-        )
-Project.initialize()
+class Obby():
+    def __init__(self, info={}):
+        self.__dict__.update(info)
 
-class Build(goatfish.Model):
-    class Meta:
-        connection = sqlite3.connect("./data.db", check_same_thread = False)
-        indexes = (
-            ("bid",),
-            ("bid", "project", "data", "built", "success"),
-        )
-Build.initialize()
-
-# project = Project()
-# project.pid = 1
-# project.name = "SWiSH"
-# project.desc = "An improved ioquake3/Urban Terror build created by Strata (mirrored by Neek)"
-# project.url = "https://github.com/spekode/SWiSH_ioUrT"
-# project.git = "git://github.com/spekode/SWiSH_ioUrT.git"
-# project.builds = []
-# project.downloads = 0
-# project.save()
-
-def getProjects():
-    a = []
-    for i in Project.find():
-        g, b = 0, 0
-        for x in i.builds:
-            for y in Build.find({'bid':x}):
-                if y.built:
-                    if y.success: g += 1
-                    else: b += 1
-        a.append({'pid':i.pid, 'name':i.name, 'desc':i.desc, 'buildcount':[g,b]})
-    return a
+def getStats():
+    global statsc
+    if not statsc: 
+        statsc = Obby()
+        statsc.rebuild = True
+    if getattr(statsc, 'rebuild', False):
+        statsc.total_builds = 0
+        statsc.total_projects = len([i for i in Project.select()])
+        statsc.total_downloads = 0
+        statsc.total_win = 0
+        statsc.total_fail = 0
+        for i in Build.select():
+            statsc.total_builds += 1
+            if i.success: statsc.total_win += 1
+            else: statsc.total_fail += 1
+            statsc.total_downloads += i.downloads
+    return statsc
 
 @app.route('/')
 def index():
-    return actionIndex() 
+    v = Obby()
+    v.stats = getStats()
+    v.title = "Home"
+    v.projects = [i for i in Project.select().where(active=True)]
+    return render_template('index.html', v=v)
 
-@app.route('/project/')
 @app.route('/project/<pid>/')
 def projectView(pid=None):
-    if pid:
-        if pid.isdigit(): return "Blah %s | %s" % (pid, action)
-        flash('The project you requested does not exsist!')
-        return redirect(url_for('index'))
-    else: return actionProjects()
-
-@app.route('/project/<pid>/builds/')
-@app.route('/project/<pid>/builds/<bid>')
-def buildView(pid=None, bid=None): pass
+    if pid and pid.isdigit() or isinstance(pid, int):
+        q = [i for i in Project.select().where(id=int(pid))]
+        if len(q):
+            return "Yay!"
+        else: flash('No project with ID #%s' % pid)
+    else: flash('The project ID is invalid!')
+    return redirect(url_for('index'))
 
 @app.route('/builds/')
-def buildsView():
-    return render_template('build.html', builds=[i for i in Build.find()], projects=[i for i in Project.find()])
+@app.route('/build/<bid>')
+@app.route('/build/p/<pid>')
+@app.route('/build/dl/<did>')
+def buildView(pid=None, bid=None, did=None): pass
 
-def actionProjects(): pass
-
-def actionIndex():
-    data = {
-    'projects':getProjects()
-    }
-    data.update(cached_stats)
-    return render_template('index.html', data=data)
-
-@app.route('/api/<action>/', methods=['GET', 'POST'])
+@app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
-    if action == "gitty":
-        print request.args.keys()
+    if action == "github":
+        print request.form.keys()
+    elif action == "gitlab":
+        print request.form.keys()
+    elif action == "buildfin":
+        print request.form.keys()
+    else: pass
 
 if __name__ == '__main__':
-    q =  [i for i in Build.find()]
-    p_count = len([i for i in Project.find()])
-    b_count = [len([i for i in q if i.success]), len([i for i in q if not i.success])]
-    b_count.append(sum(b_count))
-    d_count = sum([i.downloads for i in Project.find()])
-    cached_stats = {
-    'num_projects':p_count,
-    'num_builds':b_count,
-    'num_downloads':d_count,
-    }
     app.run(debug=True, host='0.0.0.0')

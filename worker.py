@@ -1,62 +1,86 @@
 from collections import deque
 import socket, json, thread
 import sys, os, time, urllib2
+import requests, subprocess
 
 acpt_addr = ['127.0.0.1']
-actions = {}
-b = Builder(sys.argv[1])
+main_addr = "127.0.0.1:5001"
+our_addr = "127.0.0.1:5001"
+web_dir = "/var/www/buildy"
 
-class Builder():
-    def __init__(self, name):
-        self.name = name
-        self.throttle = [0, False] #Time in secs, enabled
-        self.cur_action = [None, 0, 0] #action, start, end
+class Job():
+    def __init__(self, bid, info):
         self.building = False
-        self.q = deque()
+        self.bid = bid
+        self.info = info
 
-    def build(self, jobid, action, callback=None):
-        job = []
-        for item in action:
-            self.cur_action = [action['name'], time.time(), 0]
-            p = Popen(action['exec'], shell=True)
-            p.wait()
-            self.cur_action[2] = time.time()
-            job.append(self.cur_action)
+        self.success = True
+        self.result = None
 
-def Action(name):
-    def deco(func):
-        actions[name] = func
-        return func
-    return deco
+    def _build(self):
+        self.building = True
+        try: 
+            if not subprocess.Popen('git clone %s' % (self.info['git'],), shell=True).wait() == 0:
+                self.success = False
+                self.result = "Could not clone repository!"
+            else:
+                os.chdir(os.path.join(os.getcwd(), self.info['dir']))
+                for i in self.info['actions']:
+                    if i['type'] == 'sh':
+                        p = subprocess.Popen(i['action'], shell=True)
+                        code = p.wait()
+                        if code != i['exitcode']:
+                            self.success = False
+                            self.result = "Error on action: %s" % i['action']
+                            break
+                if self.info['result']['type'] == "files" and self.success:
+                    if not subprocess.Popen("tar -zcvf build_%s.tar.gz output" % (self.bid,), shell=True).wait() == 0:
+                        self.success = False
+                        self.result = "Could not package output!"
+                    else: subprocess.Popen('mv build_%s.tar.gz %s/' % (self.bid, web_dir))
+                subprocess.Popen('rm -rf %s' % i['dir'])
+        except: 
+            self.success = False
+            self.result = "Unknown error in build!"
+        self.done()
 
-@Action('status')
-def checkStatus(c, obj):
-    c.send(json.dumps({'response':'GOOD', 'data':{'status':b.building, 'queuesize':len(b.q), 'throttle':b.throttle}}))
+    def done(self):
+        self.building = False
+        requests.post('http://'+main_addr+'/api/buildfin/', data={'bid':self.bid, 'success':self.success, 'result':self.result})
+        print 'Done!'
 
-def parser(c, data):
-    if data['action'] in actions.keys():
-        actions[data['action']](c, data)
-    else:
-        c.send(json.dumps({'response':'BAD', 'error':2}))
+    def build(self):
+        thread.start_new_thread(self._build, ())
 
 def serverThread():
+    global sock
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("127.0.0.1", 7650))
-    sock.listen(1)
+    sock.bind(("127.0.0.1", 7660))
+    sock.listen(2)
     while True:
-        client, address = sock.accept()
-        if not address in acpt_adrr: client.close()
+        client, addr = sock.accept()
+        if not addr[0] in acpt_addr: 
+            print addr
+            client.close()
+            continue
         data = client.recv(2048)
         if data:
-            try:
-                parser(client, json.loads(data))
-            except:
-                client.send(json.dumps({'response':'BAD', 'error':1}))
-
-thread.start_new_thread(serverThread, ())
-while True: time.sleep(5)
-
-#NOTES:
-#ERRORS:
-#1: incomplete/corrupted json data
-#2: unknown/incorrect api call
+            if 1==1:
+            #try:
+                data = json.loads(data)
+                if data['a'] == "build":
+                    print 'Building!'
+                    with open(os.path.join('projfiles', str(data['id'])+'.proj'), 'r') as f:
+                        b = Job(data['job'], json.load(f))
+                        b.build()
+            #except:
+            #    print 'Faild!'
+            #    client.close()
+try: serverThread()
+except KeyboardInterrupt: 
+    print ":3"
+    sock.close()
+#try: serverThread()
+#except: 
+    #sock.disconnect()
+    #sock.close()
