@@ -61,7 +61,7 @@ def serverThread():
     while True:
         client, addr = sock.accept()
         if not addr[0] in acpt_addr: 
-            print addr
+            print 'Denied from %s' % addr
             client.close()
             continue
         data = client.recv(2048)

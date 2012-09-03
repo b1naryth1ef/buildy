@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, url_for, make_response, redirect, flash
-import sys, os, time, random
+import sys, os, time, random, socket
 from database import Project, Build
 
 app = Flask(__name__)
@@ -69,7 +69,7 @@ def runBuild(b):
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
-    global buildinc
+    global buildinc, statsc
     if action == "github":
         print request.form.keys()
         print request.json
@@ -83,6 +83,7 @@ def api(action=None):
         else:
             print 'Invalid build info!', d, q
     elif action == "buildfin":
+        statsc.rebuild = True
         print request.form.keys()
     else: pass
     return ":3"
