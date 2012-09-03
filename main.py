@@ -94,6 +94,7 @@ def api(action=None):
             print b[0].success
             if b[0].success:
                 b[0].burl = request.form['result']
+            b[0].save()
         statsc.rebuild = True
     else: pass
     return ":3"
