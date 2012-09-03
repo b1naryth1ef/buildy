@@ -42,7 +42,7 @@ class Job():
                         self.result = "Could not package output!"
                     else: subprocess.Popen('mv build_%s.tar.gz %s' % (self.bid, web_dir), shell=True)
                 os.chdir(org)
-                print 'Removing dir: ', subprocess.Popen('rm -rf %s' % i['dir'], shell=True).wait()
+                print 'Removing dir: ', subprocess.Popen('rm -rf %s' % self.info['dir'], shell=True).wait()
         #except: 
         #    self.success = False
         #    self.result = "Unknown error in build!"
