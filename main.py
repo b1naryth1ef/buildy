@@ -6,7 +6,7 @@ app = Flask(__name__)
 app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
 statsc = None
-buildinc = max([i.bnum for i in Build.select()])
+buildinc = max([i.bnum for i in Build.select()] or [0])
 build_servers = ['127.0.0.1']
 
 class Obby():
