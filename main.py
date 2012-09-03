@@ -67,18 +67,18 @@ def runBuild(b):
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
+    global buildinc
     if action == "github":
         print request.form.keys()
         print request.json
     elif action == "gitlab":
         d = request.json
-        print d
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
             buildinc += 1
             b = Build.create(project=q[0], bnum=buildinc, code=random.randint(1000, 9999))
         else:
-            print 'invalid build info!', q, [i.repo_name for i in Project.select()]
+            print 'Invalid build info!', d, q
     elif action == "buildfin":
         print request.form.keys()
     else: pass
