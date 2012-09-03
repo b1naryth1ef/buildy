@@ -70,7 +70,7 @@
 
 <!-- Left side content -->
 <div id="leftSide">
-    <div class="logo"><a href="index.html"><img src="/static/images/buildy_logo.png" alt="" /></a></div>
+    <div class="logo"><a href="/"><img src="/static/images/buildy_logo.png" alt="" /></a></div>
     <div class="sidebarSep mt0"></div>
     <div class="numStats">
         <ul>
@@ -104,6 +104,7 @@
     <div class="line"></div>
     
     <!-- Page statistics area -->
+    {% block stats %}
     <div class="statsRow">
         <div class="wrapper statsItems">
             <div class="sItem ticketsStats">
@@ -116,7 +117,7 @@
     </div>
     
     <div class="line"></div>
-    
+    {% endblock %}
     <!-- Main content wrapper -->
     <div class="wrapper">
         <!-- Message/etc -->
