@@ -53,12 +53,17 @@ def projectView(pid=None):
 @app.route('/build/dl/<did>')
 def buildView(pid=None, bid=None, did=None): pass
 
+def createBuild(): pass
+
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
     if action == "github":
         print request.form.keys()
     elif action == "gitlab":
         print request.form.keys()
+        print request.args.keys()
+        print request.data
+        print request.json
     elif action == "buildfin":
         print request.form.keys()
     else: pass

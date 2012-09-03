@@ -4,14 +4,15 @@ import sys, os, time, urllib2
 import requests, subprocess
 
 acpt_addr = ['127.0.0.1']
-main_addr = "127.0.0.1:5001"
+main_addr = "hydr0.com:5000"#"127.0.0.1:5001"
 our_addr = "127.0.0.1:5001"
 web_dir = "/var/www/buildy"
 
 class Job():
-    def __init__(self, bid, info):
+    def __init__(self, bid, bcode, info):
         self.building = False
         self.bid = bid
+        self.bcode = bcode
         self.info = info
 
         self.success = True
@@ -38,7 +39,7 @@ class Job():
                         self.success = False
                         self.result = "Could not package output!"
                     else: subprocess.Popen('mv build_%s.tar.gz %s/' % (self.bid, web_dir))
-                subprocess.Popen('rm -rf %s' % i['dir'])
+                subprocess.Popen('cd ..; rm -rf %s' % i['dir'])
         except: 
             self.success = False
             self.result = "Unknown error in build!"
@@ -46,7 +47,7 @@ class Job():
 
     def done(self):
         self.building = False
-        requests.post('http://'+main_addr+'/api/buildfin/', data={'bid':self.bid, 'success':self.success, 'result':self.result})
+        requests.post('http://'+main_addr+'/api/buildfin/', data={'bid':self.bid, 'bcode':self.bcode, 'success':self.success, 'result':self.result})
         print 'Done!'
 
     def build(self):

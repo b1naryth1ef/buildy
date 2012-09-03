@@ -18,6 +18,8 @@ class Build(BaseModel):
     project = ForeignKeyField(Project, "builds")
     bnum = IntegerField()
     burl = CharField()
+    code = IntegerField()
+    finished = BooleanField()
     success = BooleanField()
     downloads = IntegerField()
 
