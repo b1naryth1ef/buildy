@@ -91,6 +91,7 @@ def api(action=None):
         else:
             b[0].finished = True
             b[0].success = bool(request.form['success'])
+            print b[0].success
             if b[0].success:
                 b[0].burl = request.form['result']
         statsc.rebuild = True
