@@ -72,7 +72,7 @@ def serverThread():
                 if data['a'] == "build":
                     print 'Building!'
                     with open(os.path.join('projfiles', str(data['id'])+'.proj'), 'r') as f:
-                        b = Job(data['job'], json.load(f))
+                        b = Job(data['job'], data['bcode'], json.load(f))
                         b.build()
             #except:
             #    print 'Faild!'

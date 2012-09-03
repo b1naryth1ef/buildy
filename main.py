@@ -63,6 +63,7 @@ def runBuild(b):
         'a':'build',
         'id':b.project.id,
         'job':b.bnum,
+        'bcode':b.code
         }))
     c.close()
     print 'SENT!'
