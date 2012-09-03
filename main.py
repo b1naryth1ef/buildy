@@ -7,6 +7,7 @@ app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
 statsc = None
 buildinc = max([i.bnum for i in Build.select()])
+build_servers = ['127.0.0.1']
 
 class Obby():
     def __init__(self, info={}):
@@ -55,6 +56,14 @@ def projectView(pid=None):
 def buildView(pid=None, bid=None, did=None): pass
 
 def runBuild(b):
+    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    c.connect((random.choice(build_servers), 7660))
+    c.send(json.dumps({
+        'a':'build',
+        'id':b.project.id,
+        'job':b.bnum,
+        }))
+    c.close()
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
