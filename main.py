@@ -6,6 +6,7 @@ app = Flask(__name__)
 app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
 statsc = None
+buildinc = max([i.bnum for i in Build.select()])
 
 class Obby():
     def __init__(self, info={}):
@@ -53,17 +54,19 @@ def projectView(pid=None):
 @app.route('/build/dl/<did>')
 def buildView(pid=None, bid=None, did=None): pass
 
-def createBuild(): pass
+def runBuild(b):
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
     if action == "github":
         print request.form.keys()
-    elif action == "gitlab":
-        print request.form.keys()
-        print request.args.keys()
-        print request.data
         print request.json
+    elif action == "gitlab":
+        d = request.json
+        q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
+        if len(q):
+            buildinc += 1
+            b = Build.create(project=q[0], bnum=buildinc, code=random.randint(1000, 9999))
     elif action == "buildfin":
         print request.form.keys()
     else: pass
