@@ -30,6 +30,7 @@ def getStats():
             else: statsc.total_fail += 1
             statsc.total_downloads += i.downloads
     return statsc
+getStats()
 
 @app.route('/')
 def index():
@@ -84,8 +85,9 @@ def api(action=None):
         else:
             print 'Invalid build info!', d, q
     elif action == "buildfin":
-        statsc.rebuild = True
         print request.form.keys()
+        statsc.rebuild = True
+        
     else: pass
     return ":3"
 
