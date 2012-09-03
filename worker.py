@@ -6,7 +6,8 @@ import requests, subprocess
 acpt_addr = ['127.0.0.1']
 main_addr = "hydr0.com:5000"#"127.0.0.1:5001"
 our_addr = "127.0.0.1:5001"
-web_dir = "/var/www/buildy"
+out_addr = "hydr0.com/builds/"
+web_dir = "/var/www/builds"
 
 class Job():
     def __init__(self, bid, bcode, info):
@@ -21,8 +22,7 @@ class Job():
     def _build(self):
         org = os.getcwd()
         self.building = True
-        #try: 
-        if 1==1:
+        try: 
             if not subprocess.Popen('git clone %s' % (self.info['git'],), shell=True).wait() == 0:
                 self.success = False
                 self.result = "Could not clone repository!"
@@ -40,12 +40,14 @@ class Job():
                     if not subprocess.Popen("tar -zcvf build_%s.tar.gz output" % (self.bid,), shell=True).wait() == 0:
                         self.success = False
                         self.result = "Could not package output!"
-                    else: subprocess.Popen('mv build_%s.tar.gz %s' % (self.bid, web_dir), shell=True)
+                    else: 
+                        subprocess.Popen('mv build_%s.tar.gz %s' % (self.bid, web_dir), shell=True)
+                        self.result = out_addr+"build_%s.tar.gz" % (self.bid)
                 os.chdir(org)
                 print 'Removing dir: ', subprocess.Popen('rm -rf %s' % self.info['dir'], shell=True).wait()
-        #except: 
-        #    self.success = False
-        #    self.result = "Unknown error in build!"
+        except: 
+            self.success = False
+            self.result = "Unknown error in build!"
         self.done()
 
     def done(self):
@@ -70,21 +72,16 @@ def serverThread():
         data = client.recv(2048)
         if data:
             if 1==1:
-            #try:
+            try:
                 data = json.loads(data)
                 if data['a'] == "build":
                     print 'Building!'
                     with open(os.path.join('projfiles', str(data['id'])+'.proj'), 'r') as f:
                         b = Job(data['job'], data['bcode'], json.load(f))
                         b.build()
-            #except:
-            #    print 'Faild!'
-            #    client.close()
+            except:
+                print 'Faild!'
+                client.close()
 try: serverThread()
 except KeyboardInterrupt: 
-    print ":3"
     sock.close()
-#try: serverThread()
-#except: 
-    #sock.disconnect()
-    #sock.close()

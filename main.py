@@ -85,10 +85,15 @@ def api(action=None):
         else:
             print 'Invalid build info!', d, q
     elif action == "buildfin":
-        print request.form.keys()
-        print request.form.values()
+        b = [i for i in Build.select().where(bnum=request.form['bid'], code=request.form['bcode'])]
+        if not len(b):
+            print 'Invalid build!'
+        else:
+            b[0].finished = True
+            b[0].success = bool(request.form['success'])
+            if b[0].success:
+                b[0].burl = request.form['result']
         statsc.rebuild = True
-        
     else: pass
     return ":3"
 
