@@ -72,13 +72,17 @@ def api(action=None):
         print request.json
     elif action == "gitlab":
         d = request.json
+        print d
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
             buildinc += 1
             b = Build.create(project=q[0], bnum=buildinc, code=random.randint(1000, 9999))
+        else:
+            print 'invalid build info!'
     elif action == "buildfin":
         print request.form.keys()
     else: pass
+    return ":3"
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
