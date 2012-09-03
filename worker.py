@@ -71,7 +71,6 @@ def serverThread():
             continue
         data = client.recv(2048)
         if data:
-            if 1==1:
             try:
                 data = json.loads(data)
                 if data['a'] == "build":
