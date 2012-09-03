@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for i in p.builds %}
+            {% for i in v.builds %}
                 <tr>
                     <td align="center">
                         <a href="{% if i.success %}{{ i.burl }}{% else %}#{%endif%}" title="" class="webStatsLink">{{ i.bnum }}</a>
