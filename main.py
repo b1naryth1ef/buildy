@@ -86,6 +86,7 @@ def api(action=None):
             print 'Invalid build info!', d, q
     elif action == "buildfin":
         print request.form.keys()
+        print request.form.values()
         statsc.rebuild = True
         
     else: pass
