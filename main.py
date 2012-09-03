@@ -91,11 +91,14 @@ def api(action=None):
         else:
             b[0].finished = True
             b[0].success = bool(request.form['success'])
-            print b[0].success
             if b[0].success:
                 b[0].burl = request.form['result']
+                b[0].project.b_win += 1
+            else:
+                b[0].project.b_fail += 1
+            b[0].project.save()
             b[0].save()
-        statsc.rebuild = True
+        statsc.rebuild = True 
     else: pass
     return ":3"
 
