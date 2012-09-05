@@ -89,7 +89,7 @@ def api(action=None):
         else:
             print request.form
             b[0].finished = True
-            b[0].success = bool(request.form['success'])
+            b[0].success = bool(int(request.form['success']))
             if b[0].success:
                 b[0].burl = request.form['result']
                 b[0].project.b_win += 1
