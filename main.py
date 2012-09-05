@@ -87,6 +87,7 @@ def api(action=None):
         if not len(b):
             print 'Invalid build!'
         else:
+            print request.form
             b[0].finished = True
             b[0].success = bool(request.form['success'])
             if b[0].success:

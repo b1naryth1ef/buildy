@@ -51,6 +51,7 @@ class Job():
         self.done()
 
     def done(self):
+        print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
         self.building = False
         requests.post('http://'+main_addr+'/api/buildfin/', data={'bid':self.bid, 'bcode':self.bcode, 'success':self.success, 'result':self.result})
         print 'Done!'
