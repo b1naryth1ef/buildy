@@ -6,7 +6,6 @@ app = Flask(__name__)
 app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
 statsc = None
-buildinc = max([i.bnum for i in Build.select()] or [0])
 build_servers = ['127.0.0.1']
 
 class Obby():
@@ -65,7 +64,8 @@ def runBuild(b):
     c.send(json.dumps({
         'a':'build',
         'id':b.project.id,
-        'job':b.bnum,
+        'dir':b.project.name
+        'job':b.id,
         'bcode':b.code
         }))
     c.close()
@@ -73,7 +73,7 @@ def runBuild(b):
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
-    global buildinc, statsc
+    global statsc
     if action == "github":
         print request.form.keys()
         print request.json
@@ -81,19 +81,19 @@ def api(action=None):
         d = request.json
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
-            buildinc += 1
+            binc = max([i.bnum for i in Build.select().where(project=q[0])])+1
             b = Build.create(
                     project=q[0], 
-                    bnum=buildinc, 
+                    bnum=binc, 
                     code=random.randint(1000, 9999),
-                    commit=d['commits'][0]['message'],
-                    commit_by=d['commits'][0]['author']['name'],
-                    commit_url=d['commits'][0]['url'].split('http://hydr0.com')[-1])
+                    commit=d['commits'][-1]['message'],
+                    commit_by=d['commits'][-1]['author']['name'],
+                    commit_url=d['commits'][-1]['url'].split('http://hydr0.com')[-1])
             runBuild(b)
         else:
             print 'Invalid build info!', d, q
     elif action == "buildfin":
-        b = [i for i in Build.select().where(bnum=request.form['bid'], code=request.form['bcode'])]
+        b = [i for i in Build.select().where(id=request.form['bid'], code=request.form['bcode'])]
         if not len(b):
             print 'Invalid build!'
         else:

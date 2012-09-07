@@ -12,9 +12,10 @@ web_dir = "/var/www/buildy/builds"
 class Break(Exception): pass
 
 class Job():
-    def __init__(self, bid, bcode, info):
+    def __init__(self, bid, bcode, bdir, info):
         self.building = False
         self.bid = bid
+        self.bdir = bdir
         self.bcode = bcode
         self.info = info
 
@@ -67,14 +68,18 @@ class Job():
             if not self.open("tar -zcvf build_%s.tar.gz output" % self.bid):
                 Break(self.fail("Could not package build!"))
 
-            if not self.open("mv build_%s.tar.gz %s" % (self.bid, web_dir)):
+            p = os.path.join(web_dir, self.bdir)
+            if not os.path.exists(p):
+                os.mkdir(p)
+
+            if not self.open("mv build_%s.tar.gz %s" % (self.bid, p)):
                 Break(self.fail("Failed to move compressed build to web directory!"))
             os.chdir(org)
 
             if self.info['type'] == 'dynamic':
                 self.open('rm -rf %s' % self.info['dir'])
 
-            self.result = out_addr+"build_%s.tar.gz" % (self.bid)
+            self.result = out_addr+self.bdir+"/build_%s.tar.gz" % (self.bid)
         except:
             if self.success:
                 self.success = False
@@ -108,7 +113,7 @@ def serverThread():
                 if data['a'] == "build":
                     print 'Building!'
                     with open(os.path.join('projfiles', str(data['id'])+'.proj'), 'r') as f:
-                        b = Job(data['job'], data['bcode'], json.load(f))
+                        b = Job(data['job'], data['bcode'], data['dir'], json.load(f))
                         b.build()
             except:
                 print 'Faild!'
