@@ -78,7 +78,13 @@ def api(action=None):
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
             buildinc += 1
-            b = Build.create(project=q[0], bnum=buildinc, code=random.randint(1000, 9999))
+            b = Build.create(
+                    project=q[0], 
+                    bnum=buildinc, 
+                    code=random.randint(1000, 9999),
+                    commit=d['commits'][0]['message'],
+                    commit_by=d['commits'][0]['author']['name'],
+                    commit_url=d['commits'][0]['url'])
             runBuild(b)
         else:
             print 'Invalid build info!', d, q
