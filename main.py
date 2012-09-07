@@ -20,14 +20,18 @@ def getStats():
         statsc.rebuild = True
     if getattr(statsc, 'rebuild', False):
         statsc.total_builds = 0
+        statsc.total_building = 0
         statsc.total_projects = len([i for i in Project.select()])
         statsc.total_downloads = 0
         statsc.total_win = 0
         statsc.total_fail = 0
         for i in Build.select():
             statsc.total_builds += 1
-            if i.success: statsc.total_win += 1
-            else: statsc.total_fail += 1
+            if i.finished:
+                if i.success: statsc.total_win += 1
+                else: statsc.total_fail += 1
+            else:
+                statsc.total_building += 1
             statsc.total_downloads += i.downloads
     return statsc
 getStats()
