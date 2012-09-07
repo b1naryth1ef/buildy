@@ -52,7 +52,7 @@ def projectView(pid=None):
             v = Obby()
             v.stats = getStats()
             v.title = "%s" % q[0].name
-            v.builds = [i for i in Build.select().where(project=q[0])]
+            v.builds = list(reversed([i for i in Build.select().where(project=q[0])]))
             return render_template('project.html', p=q[0], v=v)
         else: flash('No project with ID #%s' % pid)
     else: flash('The project ID is invalid!')
