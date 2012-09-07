@@ -24,6 +24,7 @@ class Job():
     def open(self, *args, **kwargs):
         nice = kwargs.get('nice')
         if nice != None: del kwargs['nice']
+        kwargs['shell'] = True
         res = subprocess.Popen(*args, **kwargs).wait()
         if nice:
             return res
