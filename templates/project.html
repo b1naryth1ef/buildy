@@ -22,7 +22,7 @@
                     <td align="center">
                         <a href="{% if i.success %}{{ i.burl }}{% else %}#{%endif%}" title="" class="webStatsLink">{{ i.bnum }}</a>
                     </td>
-                    <td><a href="{{ i.commit_url }}">{{ i.commit }}</a></td>
+                    <td><a href="http://git.hydr0.com/{{ i.commit_url }}">{{ i.commit }}</a></td>
                     <td>{{ i.commit_by }}
                     <td>{% if i.success %}Finished!{% else %}Failed!{% endif %}</td>
                     
