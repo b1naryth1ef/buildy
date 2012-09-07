@@ -22,7 +22,8 @@ class Job():
         self.result = None
 
     def open(self, *args, **kwargs):
-        res = subprocess.Popen(*args, **kwargs, shell=True).wait()
+        kwargs['shell'] = True
+        res = subprocess.Popen(*args, **kwargs).wait()
         if 'nice' in kwargs.keys():
             return res
         return res == 0
