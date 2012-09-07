@@ -64,7 +64,7 @@ def runBuild(b):
     c.send(json.dumps({
         'a':'build',
         'id':b.project.id,
-        'dir':b.project.name
+        'dir':b.project.name,
         'job':b.id,
         'bcode':b.code
         }))
