@@ -7,7 +7,7 @@ acpt_addr = ['127.0.0.1']
 main_addr = "build.hydr0.com"#"127.0.0.1:5001"
 our_addr = "127.0.0.1:9013"
 out_addr = "http://build.hydr0.com/builds/"
-web_dir = "/var/www/hydr0/builds"
+web_dir = "/var/www/buildy/builds"
 
 class Break(Exception): pass
 
