@@ -45,7 +45,8 @@ class Job():
         org = os.getcwd()
         d = os.path.join(org, self.info['dir'])
         self.building = True
-        try:
+        #try:
+        if 1==1:
             if not os.path.exists(d) or self.info['type'] == 'dynamic':
                 if not self.open('git clone %s' % self.info['git']):
                     raise Break(self.fail("Could not clone git repo!"))
@@ -70,10 +71,10 @@ class Job():
 
             if self.info['type'] == 'dynamic':
                 self.open('rm -rf %s' % self.info['dir'])
-        except:
-            if self.success:
-                self.success = False
-                self.result = "Unknown build error!"
+        #except:
+        #    if self.success:
+        #        self.success = False
+        #        self.result = "Unknown build error!"
         self.done()
 
     def done(self):
