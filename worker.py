@@ -59,7 +59,7 @@ class Job():
             if not self.open("git pull origin master"):
                 raise Break(self.fail('Could not update git repo!'))
             
-            self.action(self.info['actions']):
+            self.action(self.info['actions'])
 
             if not self.open("tar -zcvf build_%s.tar.gz output" % self.bid):
                 Break(self.fail("Could not package build!"))
