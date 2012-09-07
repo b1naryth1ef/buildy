@@ -28,7 +28,7 @@ def createStuffz():
     Project.create_table(True)
     Build.create_table(True)
     test = Project.create(name="2D2", repo_name="neeks_engine", desc="2DEngine2 is a game and gui engine written by neek", git="git@hydr0.com:neeks_engine.git", active=True)
-    test2 = Project.create(name="Strata ioQ3", desc="A ioQ3 client written for Urban Terror 4.x by Strata", git="git://github.com/SudoKing/ioq3-urt-4.2.git", active=True)
+    test2 = Project.create(name="McL33tz", desc="A minecraft client mod that we use to hax nubs and make them babies ragequit", git="git@hydr0.com:mcl33tz.git", active=True)
 
 if __name__ == '__main__':
     createStuffz()

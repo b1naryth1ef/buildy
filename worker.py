@@ -9,6 +9,8 @@ our_addr = "127.0.0.1:5001"
 out_addr = "http://hydr0.com/builds/"
 web_dir = "/var/www/hydr0/builds"
 
+class Break(Exception): pass
+
 class Job():
     def __init__(self, bid, bcode, info):
         self.building = False
@@ -19,42 +21,65 @@ class Job():
         self.success = True
         self.result = None
 
+    def open(self, *args, **kwargs):
+        res = subprocess.Popen(*args, **kwargs, shell=True).wait()
+        if 'nice' in kwargs.keys():
+            return res
+        return res == 0
+
+    def fail(self, msg):
+        self.result = msg
+        self.success = False
+        return msg
+
+    def action(self, acts):
+        for i in acts:
+            if i['type'] == 'sh':
+                res = self.open(i['action'], nice=True)
+                if res not in i['exitcode']:
+                    raise Break(self.fail('Error on action: %s' % i['action']))
+        else: return True
+
     def _build(self):
         org = os.getcwd()
+        d = os.path.join(org, self.info['dir'])
         self.building = True
-        try: 
-            if not subprocess.Popen('git clone %s' % (self.info['git'],), shell=True).wait() == 0:
+        try:
+            if not os.path.exists(d) or self.info['type'] == 'dynamic':
+                if not self.open('git clone %s' % self.info['git']):
+                    raise Break(self.fail("Could not clone git repo!"))
+                if self.info['type'] == 'static': setup = True
+
+            os.chdir(d)
+
+            if setup:
+                self.action(self.info['setup'])
+
+            if not self.open("git pull origin master"):
+                raise Break(self.fail('Could not update git repo!'))
+            
+            self.action(self.info['actions']):
+
+            if not self.open("tar -zcvf build_%s.tar.gz output" % self.bid):
+                Break(self.fail("Could not package build!"))
+
+            if not self.open("mv build_%s.tar.gz %s" % (self.bid, web_dir)):
+                Break(self.fail("Failed to move compressed build to web directory!"))
+            os.chdir(org)
+
+            if self.info['type'] == 'dynamic':
+                self.open('rm -rf %s' % self.info['dir'])
+        except:
+            if self.success:
                 self.success = False
-                self.result = "Could not clone repository!"
-            else:
-                os.chdir(os.path.join(org, self.info['dir']))
-                for i in self.info['actions']:
-                    if i['type'] == 'sh':
-                        p = subprocess.Popen(i['action'], shell=True)
-                        code = p.wait()
-                        if code != i['exitcode']:
-                            self.success = False
-                            self.result = "Error on action: %s" % i['action']
-                            break
-                if self.info['result']['type'] == "files" and self.success:
-                    if not subprocess.Popen("tar -zcvf build_%s.tar.gz output" % (self.bid,), shell=True).wait() == 0:
-                        self.success = False
-                        self.result = "Could not package output!"
-                    else: 
-                        subprocess.Popen('mv build_%s.tar.gz %s' % (self.bid, web_dir), shell=True)
-                        self.result = out_addr+"build_%s.tar.gz" % (self.bid)
-                os.chdir(org)
-                print 'Removing dir: ', subprocess.Popen('rm -rf %s' % self.info['dir'], shell=True).wait()
-        except: 
-            self.success = False
-            self.result = "Unknown error in build!"
+                self.result = "Unknown build error!"
         self.done()
 
     def done(self):
         print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
         self.building = False
         requests.post('http://'+main_addr+'/api/buildfin/', data={'bid':self.bid, 'bcode':self.bcode, 'success':int(self.success), 'result':self.result})
-        print 'Done!'
+        print 'Done!\n'
 
     def build(self):
         thread.start_new_thread(self._build, ())

@@ -2,24 +2,22 @@
   "pid": 1, 
   "git": "git@hydr0.com:neeks_engine.git",
   "dir": "neeks_engine",
-  "result": {
-    "type": "files"
-  }, 
+  "type":"dynamic",
   "actions": [
     {
       "action": "chmod +x build", 
       "type": "sh", 
-      "exitcode": 0
+      "exitcode": [0]
     }, 
     {
       "action": "./build", 
       "type": "sh", 
-      "exitcode": 0
+      "exitcode": [0]
     },
     {
       "action": "mkdir output; mv engine output",
       "type": "sh",
-      "exitcode": 0
+      "exitcode": [0]
     }
   ]
 }
