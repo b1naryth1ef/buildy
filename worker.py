@@ -45,6 +45,7 @@ class Job():
         org = os.getcwd()
         d = os.path.join(org, self.info['dir'])
         self.building = True
+        setup = False
         #try:
         if 1==1:
             if not os.path.exists(d) or self.info['type'] == 'dynamic':
