@@ -4,9 +4,9 @@ import sys, os, time, urllib2
 import requests, subprocess
 
 acpt_addr = ['127.0.0.1']
-main_addr = "hydr0.com:5000"#"127.0.0.1:5001"
-our_addr = "127.0.0.1:5001"
-out_addr = "http://hydr0.com/builds/"
+main_addr = "build.hydr0.com"#"127.0.0.1:5001"
+our_addr = "127.0.0.1:9013"
+out_addr = "http://build.hydr0.com/builds/"
 web_dir = "/var/www/hydr0/builds"
 
 class Break(Exception): pass
