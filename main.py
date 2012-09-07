@@ -84,7 +84,7 @@ def api(action=None):
                     code=random.randint(1000, 9999),
                     commit=d['commits'][0]['message'],
                     commit_by=d['commits'][0]['author']['name'],
-                    commit_url=d['commits'][0]['url'])
+                    commit_url=d['commits'][0]['url'].split('http://hydr0.com')[0])
             runBuild(b)
         else:
             print 'Invalid build info!', d, q
