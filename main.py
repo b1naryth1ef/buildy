@@ -80,7 +80,7 @@ def api(action=None):
         print request.json
     elif action == "gitlab":
         d = request.json
-        q = [i for i in Project.select().where(repo_name__icontains=d['repository']['name'], active=True)]
+        q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
             binc = max([i.bnum for i in Build.select().where(project=q[0])] or [0])+1
             b = Build.create(
