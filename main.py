@@ -74,6 +74,7 @@ def runBuild(b):
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
     global statsc
+    statsc.rebuild = True 
     if action == "github":
         print request.form.keys()
         print request.json
@@ -107,7 +108,6 @@ def api(action=None):
                 b[0].project.b_fail += 1
             b[0].project.save()
             b[0].save()
-        statsc.rebuild = True 
     else: pass
     return ":3"
 

@@ -1,0 +1,57 @@
+{
+  "pid": 2, 
+  "git": "git@hydr0.com:mcl33tz.git",
+  "dir": "mcl33tz",
+  "type": "dynamic",
+  "actions":[
+    {
+      "action": "rm -rf ../mcp/jars/bin/",
+      "type": "sh",
+      "exitcode": [0, 1]
+    },
+    {
+      "action": "wget http://cl.ly/JI9g/bin.zip",
+      "type": "sh",
+      "exitcode": [0]
+    },
+    {
+      "action": "unzip bin.zip",
+      "type": "sh",
+      "exitcode": [0]
+    },
+    {
+      "action": "mv bin ../mcp/jars/",
+      "type": "sh",
+      "exitcode": [0]
+    },
+    {
+      "action": "../mcp/",
+      "type": "chdir"
+    },
+    {
+      "action": "./decompile.sh",
+      "type": "sh",
+      "exitcode": [0]
+    },
+    {
+      "action": "cp ../mcl33tz/src/ ./src/",
+      "type": "sh",
+      "exitcode": [0]
+    },
+    {
+      "action": "./recompile.sh",
+      "type": "sh",
+      "exitcode": [0]
+    },
+    {
+      "action": "./reobfuscate.sh",
+      "type": "sh",
+      "exitcode": [0]    
+    },
+    {
+      "action": "mkdir output; mv ./reobf/minecraft output; mv output ../mcl33tz/",
+      "type": "sh",
+      "exitcode": [0]
+    }
+  ]
+}

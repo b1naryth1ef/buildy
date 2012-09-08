@@ -42,6 +42,8 @@ class Job():
                 res = self.open(i['action'], nice=True)
                 if res not in i['exitcode']:
                     raise Break(self.fail('Error on action: %s' % i['action']))
+            elif i['type'] == 'chdir':
+                os.chdir(i['action'])
         else: return True
 
     def _build(self):
