@@ -94,13 +94,16 @@ class Job():
     def done(self):
         print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
         self.building = False
+        if self.buildf:
+            files = {'build':self.buildf}
+        else: files = {}
         requests.post('http://'+main_addr+'/api/buildfin/', 
+            files=files,
             data={
                 'bid':self.bid, 
                 'bcode':self.bcode, 
                 'success':int(self.success), 
                 'result':self.result, 
-                'build':self.buildf
             })
         print 'Done!\n'
 
