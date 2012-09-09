@@ -53,7 +53,7 @@ class Job():
         d = os.path.join(org, self.info['dir'])
         self.building = True
         setup = False
-        try:
+        if 1==1:
             if not os.path.exists(d) or self.info['type'] == 'dynamic':
                 if not self.open('git clone %s' % self.info['git']):
                     raise Break(self.fail("Could not clone git repo!"))
@@ -85,10 +85,10 @@ class Job():
             if self.info['type'] == 'dynamic':
                 self.open('rm -rf %s' % self.info['dir'])
 
-        except:
-            if self.success:
-                self.success = False
-                self.result = "Unknown build error!"
+        #except:
+        #    if self.success:
+        #        self.success = False
+        #        self.result = "Unknown build error!"
         self.done()
 
     def done(self):
@@ -120,16 +120,16 @@ def serverThread():
             continue
         data = client.recv(2048)
         if data:
-            try:
+            if 1==1:
                 data = json.loads(data)
                 if data['a'] == "build":
                     print 'Building!'
                     with open(os.path.join('projfiles', str(data['id'])+'.proj'), 'r') as f:
                         b = Job(data['job'], data['bcode'], data['dir'], json.load(f))
                         b.build()
-            except:
-                print 'Faild!'
-                client.close()
+            #except:
+            #    print 'Faild!'
+            #    client.close()
 try: serverThread()
 except KeyboardInterrupt: 
     sock.close()
