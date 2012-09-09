@@ -5,6 +5,7 @@ from collections import deque
 
 acpt_addr = ['127.0.0.1']
 main_addr = "build.hydr0.com"
+cleanup = []
 #out_addr = "http://build.hydr0.com/builds/"
 #web_dir = "/var/www/buildy/builds"
 
@@ -72,6 +73,7 @@ class Job():
             if not self.open("tar -zcvf build%s.tar.gz output" % self.bid):
                 Break(self.fail("Could not package build!"))
 
+            cleanup.append('build%s.tar.gz' % self.bid)
             self.buildf = open('build%s.tar.gz' % self.bid, 'rb')
 
             #p = os.path.join(web_dir, self.bdir)
@@ -80,7 +82,7 @@ class Job():
 
             #if not self.open("mv build_%s.tar.gz %s" % (self.bid, p)):
             #    Break(self.fail("Failed to move compressed build to web directory!"))
-            #os.chdir(org)
+            #
 
             if self.info['type'] == 'dynamic':
                 self.open('rm -rf %s' % self.info['dir'])
@@ -90,6 +92,10 @@ class Job():
         #        self.success = False
         #        self.result = "Unknown build error!"
         self.done()
+        for i in cleanup:
+            self.open('rm -rf %s' % i)
+        os.chdir(org)
+
 
     def done(self):
         print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
@@ -103,7 +109,7 @@ class Job():
                 'bid':self.bid, 
                 'bcode':self.bcode, 
                 'success':int(self.success), 
-                'result':self.result, 
+                'result':self.result or "No errors.", 
             })
         print 'Done!\n'
 
