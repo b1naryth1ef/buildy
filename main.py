@@ -80,7 +80,7 @@ def saveBuild(pname, f):
     if not os.path.exists(p):
         os.mkdir(p)
     f.save(os.path.join(p, f.filename))
-    return os.path.join(THIS_URL, os.path.join(p, f.filename))
+    return os.path.join(THIS_URL, pname, f.filename)
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):

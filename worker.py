@@ -85,7 +85,8 @@ class Job():
             #
 
             print "Deleteing: %s" % self.info['dir']
-            self.open('rm -rf %s' % self.info['dir'])
+            self.open('ls')
+            print self.open('rm -rf %s' % self.info['dir'])
 
         #except:
         #    if self.success:
