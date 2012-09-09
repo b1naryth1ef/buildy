@@ -116,7 +116,7 @@ def api(action=None):
             url = saveBuild(b.project.name, f)
             b.finished = True
             b.success = bool(int(request.form['success']))
-            b.result = reqeust.form['result']
+            b.result = request.form['result']
             if b.success:
                 b.burl = url
                 b.project.b_win += 1

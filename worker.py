@@ -84,8 +84,8 @@ class Job():
             #    Break(self.fail("Failed to move compressed build to web directory!"))
             #
 
-            if self.info['type'] == 'dynamic':
-                self.open('rm -rf %s' % self.info['dir'])
+            print "Deleteing: %s" % self.info['dir']
+            self.open('rm -rf %s' % self.info['dir'])
 
         #except:
         #    if self.success:
