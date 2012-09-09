@@ -5,7 +5,7 @@ from collections import deque
 
 acpt_addr = ['127.0.0.1']
 main_addr = "build.hydr0.com"
-cleanup = []
+#cleanup = []
 #out_addr = "http://build.hydr0.com/builds/"
 #web_dir = "/var/www/buildy/builds"
 
@@ -21,6 +21,7 @@ class Job():
         self.buildf = None
 
         self.output = []
+        self.cleanup
 
         self.success = True
         self.result = None
@@ -70,32 +71,22 @@ class Job():
             
             self.action(self.info['actions'])
 
-            if not self.open("tar -zcvf build%s.tar.gz output" % self.bid):
+            if not self.open("tar -zcvf build%s.tar.gz output; mv build%s.tar.gz .." % (self.bid, self.bid)):
                 Break(self.fail("Could not package build!"))
+            os.chdir(org)
 
-            cleanup.append('build%s.tar.gz' % self.bid)
+            self.cleanup.append('build%s.tar.gz' % self.bid)
+            self.cleanup.append(self.info['dir'])
             self.buildf = open('build%s.tar.gz' % self.bid, 'rb')
-
-            #p = os.path.join(web_dir, self.bdir)
-            #if not os.path.exists(p):
-            #    os.mkdir(p)
-
-            #if not self.open("mv build_%s.tar.gz %s" % (self.bid, p)):
-            #    Break(self.fail("Failed to move compressed build to web directory!"))
-            #
-
-            print "Deleteing: %s" % self.info['dir']
-            self.open('ls')
-            print self.open('rm -rf %s' % self.info['dir'])
 
         #except:
         #    if self.success:
         #        self.success = False
         #        self.result = "Unknown build error!"
         self.done()
-        for i in cleanup:
+        for i in self.cleanup:
+            print 'Removing %s' % i
             self.open('rm -rf %s' % i)
-        os.chdir(org)
 
 
     def done(self):
@@ -110,7 +101,7 @@ class Job():
                 'bid':self.bid, 
                 'bcode':self.bcode, 
                 'success':int(self.success), 
-                'result':self.result or "No errors.", 
+                'result':self.result or "", 
             })
         print 'Done!\n'
 
