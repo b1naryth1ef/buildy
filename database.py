@@ -17,6 +17,7 @@ class Project(BaseModel):
 
 class Build(BaseModel):
     project = ForeignKeyField(Project, "builds")
+    result = CharField()
     commit = CharField()
     commit_by = CharField()
     commit_url = CharField()

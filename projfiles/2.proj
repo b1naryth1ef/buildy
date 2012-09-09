@@ -5,33 +5,8 @@
   "type": "dynamic",
   "actions":[
     {
-      "action": "rm -rf ../mcp/jars/bin/",
-      "type": "sh",
-      "exitcode": [0, 1]
-    },
-    {
-      "action": "wget http://cl.ly/JI9g/bin.zip",
-      "type": "sh",
-      "exitcode": [0]
-    },
-    {
-      "action": "unzip bin.zip",
-      "type": "sh",
-      "exitcode": [0]
-    },
-    {
-      "action": "mv bin ../mcp/jars/",
-      "type": "sh",
-      "exitcode": [0]
-    },
-    {
       "action": "../mcp/",
       "type": "chdir"
-    },
-    {
-      "action": "./decompile.sh",
-      "type": "sh",
-      "exitcode": [0]
     },
     {
       "action": "cp ../mcl33tz/src/ ./src/",
@@ -39,12 +14,12 @@
       "exitcode": [0]
     },
     {
-      "action": "./recompile.sh",
+      "action": "sudo -u www-data ./recompile.sh",
       "type": "sh",
       "exitcode": [0]
     },
     {
-      "action": "./reobfuscate.sh",
+      "action": "sudo -u www-data ./reobfuscate.sh",
       "type": "sh",
       "exitcode": [0]    
     },

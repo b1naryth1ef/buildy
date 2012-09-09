@@ -1,12 +1,16 @@
 from flask import Flask, render_template, request, url_for, make_response, redirect, flash
 import sys, os, time, random, socket, json
 from database import Project, Build
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 app.secret_key = 'ads32304djlsf238mkndfi8320df'
 sessions = {}
 statsc = None
 build_servers = ['127.0.0.1']
+
+THIS_URL = "build.hydr0.com"
+BUILD_DIR = "/var/www/buildy/builds/"
 
 class Obby():
     def __init__(self, info={}):
@@ -71,6 +75,13 @@ def runBuild(b):
     c.close()
     print 'SENT!'
 
+def saveBuild(pname, f):
+    p = os.path.join(BUILD_DIR, pname)
+    if not os.path.exists(p):
+        os.mkdir(p)
+    f.save(os.path.join(p, f.filename))
+    return os.path.join(THIS_URL, os.path.join(p, f.filename))
+
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
     global statsc
@@ -95,19 +106,25 @@ def api(action=None):
             print 'Invalid build info!', d, q
     elif action == "buildfin":
         b = [i for i in Build.select().where(id=request.form['bid'], code=request.form['bcode'])]
-        if not len(b):
-            print 'Invalid build!'
+
+        f = request.files.get('build')
+        if not f or not f.filename.endswith('.tar.gz'):
+            print "Invalid file!"
+
+        if len(b):
+            b = b[0]
+            url = saveBuild(b.project.name, f)
+            b.finished = True
+            b.success = bool(int(request.form['success']))
+            b.result = reqeust.form['result']
+            if b.success:
+                b.burl = url
+                b.project.b_win += 1
+            else: b.project.b_fail += 1
+            b.project.save()
+            b.save()
         else:
-            print request.form
-            b[0].finished = True
-            b[0].success = bool(int(request.form['success']))
-            if b[0].success:
-                b[0].burl = request.form['result']
-                b[0].project.b_win += 1
-            else:
-                b[0].project.b_fail += 1
-            b[0].project.save()
-            b[0].save()
+            print 'Invalid build!'
     else: pass
     return ":3"
 

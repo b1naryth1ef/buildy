@@ -1,13 +1,12 @@
+import sys, os, time
+import socket, json, thread, urllib2
+import requests, subprocess, redis
 from collections import deque
-import socket, json, thread
-import sys, os, time, urllib2
-import requests, subprocess
 
 acpt_addr = ['127.0.0.1']
-main_addr = "build.hydr0.com"#"127.0.0.1:5001"
-our_addr = "127.0.0.1:9013"
-out_addr = "http://build.hydr0.com/builds/"
-web_dir = "/var/www/buildy/builds"
+main_addr = "build.hydr0.com"
+#out_addr = "http://build.hydr0.com/builds/"
+#web_dir = "/var/www/buildy/builds"
 
 class Break(Exception): pass
 
@@ -15,18 +14,21 @@ class Job():
     def __init__(self, bid, bcode, bdir, info):
         self.building = False
         self.bid = bid
-        self.bdir = bdir
+        self.bname = bdir
         self.bcode = bcode
         self.info = info
+        self.build = None
+
+        self.output = []
 
         self.success = True
         self.result = None
 
-    def open(self, *args, **kwargs):
+    def open(self, cmd, **kwargs):
         nice = kwargs.get('nice')
         if nice != None: del kwargs['nice']
-        kwargs['shell'] = True
-        res = subprocess.Popen(*args, **kwargs).wait()
+        #kwargs['shell'] = True
+        res = subprocess.Popen(['/bin/bash']+cmd.split(' '), **kwargs).wait()
         if nice:
             return res
         return res == 0
@@ -67,21 +69,22 @@ class Job():
             
             self.action(self.info['actions'])
 
-            if not self.open("tar -zcvf build_%s.tar.gz output" % self.bid):
+            if not self.open("tar -zcvf build%s.tar.gz output" % self.bid):
                 Break(self.fail("Could not package build!"))
 
-            p = os.path.join(web_dir, self.bdir)
-            if not os.path.exists(p):
-                os.mkdir(p)
+            self.build = open('build%s.tar.gz' % self.bid, 'rb')
 
-            if not self.open("mv build_%s.tar.gz %s" % (self.bid, p)):
-                Break(self.fail("Failed to move compressed build to web directory!"))
-            os.chdir(org)
+            #p = os.path.join(web_dir, self.bdir)
+            #if not os.path.exists(p):
+            #    os.mkdir(p)
+
+            #if not self.open("mv build_%s.tar.gz %s" % (self.bid, p)):
+            #    Break(self.fail("Failed to move compressed build to web directory!"))
+            #os.chdir(org)
 
             if self.info['type'] == 'dynamic':
                 self.open('rm -rf %s' % self.info['dir'])
 
-            self.result = out_addr+self.bdir+"/build_%s.tar.gz" % (self.bid)
         except:
             if self.success:
                 self.success = False
@@ -91,7 +94,14 @@ class Job():
     def done(self):
         print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
         self.building = False
-        requests.post('http://'+main_addr+'/api/buildfin/', data={'bid':self.bid, 'bcode':self.bcode, 'success':int(self.success), 'result':self.result})
+        requests.post('http://'+main_addr+'/api/buildfin/', 
+            data={
+                'bid':self.bid, 
+                'bcode':self.bcode, 
+                'success':int(self.success), 
+                'result':self.result, 
+                'build':self.build
+            })
         print 'Done!\n'
 
     def build(self):
