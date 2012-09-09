@@ -17,7 +17,7 @@ class Job():
         self.bname = bdir
         self.bcode = bcode
         self.info = info
-        self.build = None
+        self.buildf = None
 
         self.output = []
 
@@ -72,7 +72,7 @@ class Job():
             if not self.open("tar -zcvf build%s.tar.gz output" % self.bid):
                 Break(self.fail("Could not package build!"))
 
-            self.build = open('build%s.tar.gz' % self.bid, 'rb')
+            self.buildf = open('build%s.tar.gz' % self.bid, 'rb')
 
             #p = os.path.join(web_dir, self.bdir)
             #if not os.path.exists(p):
@@ -100,7 +100,7 @@ class Job():
                 'bcode':self.bcode, 
                 'success':int(self.success), 
                 'result':self.result, 
-                'build':self.build
+                'build':self.buildf
             })
         print 'Done!\n'
 
