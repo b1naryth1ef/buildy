@@ -21,7 +21,7 @@ class Job():
         self.buildf = None
 
         self.output = []
-        self.cleanup
+        self.cleanup = []
 
         self.success = True
         self.result = None
