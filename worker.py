@@ -122,7 +122,7 @@ def main():
     red = redis.StrictRedis()
     pub = red.pubsub()
     pub.subscribe('buildy.jobs')
-    pub.subscribe('buildy.sys.%s' % playform.system().lower())
+    pub.subscribe('buildy.sys.%s' % platform.system().lower())
     pub.subscribe('buildy.arch.%s' % platform.machine().lower())
     for i in pub.listen():
         print 'Running job...'

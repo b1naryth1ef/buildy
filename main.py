@@ -67,7 +67,6 @@ def projectView(pid=None):
 
 def runBuild(b):
     print 'Adding build to queue!'
-    for i in 
     info = json.dumps({
         'projid':b.project.id,
         'dir':b.project.name,
