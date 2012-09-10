@@ -78,10 +78,10 @@ def runBuild(b):
 def saveBuild(b, f):
     proj_dir = os.path.join(BUILD_DIR, b.project.name)
     if not os.path.exists(proj_dir): os.mkdir(proj_dir)
-    build_dir = os.path.join(BUILD_DIR, proj_dir, b.bnum)
+    build_dir = os.path.join(BUILD_DIR, proj_dir, str(b.bnum))
     if not os.path.exists(build_dir): os.mkdir(build_dir)
     f.save(os.path.join(build_dir, f.filename))
-    return os.path.join(THIS_URL, 'builds', b.project.name, b.bnum)
+    return os.path.join(THIS_URL, 'builds', b.project.name, str(b.bnum))
 
 def findStalled():
     q = [i for i in Build.select().where(finished=False) if time.time()-i.created >= 600]
