@@ -15,7 +15,7 @@
       "exitcode": [0]
     },
     {
-      "action": "mkdir output; mv engine output",
+      "action": "mkdir output; mv 2dengine output",
       "type": "sh",
       "exitcode": [0]
     }
