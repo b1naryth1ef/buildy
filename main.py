@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for, make_response, redir
 import sys, os, time, random, socket, json
 from database import Project, Build
 from werkzeug import secure_filename
+import redis
 
 app = Flask(__name__)
 app.secret_key = 'ads32304djlsf238mkndfi8320df'
