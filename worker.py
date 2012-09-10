@@ -61,7 +61,7 @@ class Job():
         d = os.path.join(org, self.info['dir'])
         self.building = True
         setup = False
-        try:
+        if 1==1: #try:
             if not os.path.exists(d) or self.info['type'] == 'dynamic':
                 if not self.open('git clone %s' % self.info['git']):
                     raise Break(self.fail("Could not clone git repo!"))
@@ -86,10 +86,10 @@ class Job():
             self.cleanup.append(name)
             
             self.buildf = open(name, 'rb')
-        except:
-            if self.success:
-                self.success = False
-                self.result = "Unknown build error!"
+        #except:
+        #    if self.success:
+        #        self.success = False
+        #        self.result = "Unknown build error!"
         try: self.done()
         except Exception, e:
             print 'Done call failed: %s' % e
@@ -126,11 +126,11 @@ def main():
         except: 
             print "Could not load json data: %s" % i
             continue
-        try:
+        if 1== 1:#try:
             with open(os.path.join('projfiles', str(d['projid'])+'.proj'), 'r') as f:
                 job = Job(d['bid'], d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
                 job.build()
-        except:
-            print "Could not load projfiles: %s" % d
-            continue
+        #except:
+        #    print "Could not load projfiles: %s" % d
+        #    continue
 main()
