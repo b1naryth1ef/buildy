@@ -10,7 +10,7 @@
       "exitcode": [0]
     },
     {
-      "action": "mkdir output; mv B1nGoLib ./output/b1ngolib",
+      "action": "mkdir output; mv b1ngolib ./output/b1ngolib",
       "type": "sh",
       "exitcode": [0]
     }

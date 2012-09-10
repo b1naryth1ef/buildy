@@ -66,6 +66,7 @@ class Job():
                     raise Break(self.fail("Could not clone git repo!"))
                 if self.info['type'] == 'static': setup = True
 
+            self.cleanup.append(self.info['dir'])
             os.chdir(d)
 
             if setup:
@@ -81,7 +82,7 @@ class Job():
             os.chdir(org)
 
             self.cleanup.append('build%s.tar.gz' % self.bid)
-            self.cleanup.append(self.info['dir'])
+            
             self.buildf = open('build%s.tar.gz' % self.bid, 'rb')
         except:
             if self.success:
