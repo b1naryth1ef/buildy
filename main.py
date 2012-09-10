@@ -69,7 +69,7 @@ def runBuild(b):
     REDIS.publish('buildyjobs', json.dumps({
         'projid':b.project.id,
         'dir':b.project.name,
-        'jobid':b.id,
+        'jobid':b.bnum,
         'bcode':b.code
         }))
     # print 'Sending build to worker...',
