@@ -106,7 +106,7 @@ class Job():
                 'bcode':self.bcode, 
                 'success':int(self.success), 
                 'result':self.result or "", 
-                'time':int(time.time()-self.start)
+                'time':"%.2f" % time.time()-self.start
             })
 
     def build(self):

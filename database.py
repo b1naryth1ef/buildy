@@ -31,7 +31,7 @@ class Build(BaseModel):
     finished = BooleanField(null=True)
     success = BooleanField(null=True)
     downloads = IntegerField(null=True)
-    time = IntegerField(null=True)
+    time = CharField(null=True)
 
 def createStuffz():
     Project.create_table(True)

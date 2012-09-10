@@ -108,8 +108,7 @@ def api(action=None):
                 info=d['commits'][-1]['message'],
                 by=d['commits'][-1]['author']['name'],
                 url=d['commits'][-1]['url'],
-                sha=d['commits'][-1]['id'][:9]
-                )
+                sha=d['commits'][-1]['id'][:9])
             b = Build.create(
                     project=q[0], 
                     bnum=binc, 
