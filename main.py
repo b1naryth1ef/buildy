@@ -102,8 +102,7 @@ def api(action=None):
     global statsc
     statsc.rebuild = True 
     if action == "github":
-        print request.form.keys()
-        print request.json
+        print request.form['payload']
     elif action == "gitlab":
         findStalled()
         d = request.json
@@ -114,17 +113,15 @@ def api(action=None):
             if len(d['commits']) > 1:
                 url = '/'.join(f[-1]['url'].replace('http://hydr0.com', '').split('/')[:-1])
                 url = url + '/compare?from=%s&to=%s' % (f[0]['id'], f[-1]['id'])
-                c = Commit.create(
-                    info=f[-1]['message'],
-                    by=f[-1]['author']['name'],
-                    url=url,
-                    sha='%s...%s' % (f[0]['id'][:9], f[-1]['id'][:9]) )
+                sha = '%s...%s' % (f[0]['id'][:9], f[-1]['id'][:9]) 
             else:
-                c = Commit.create(
-                info=f[-1]['message'],
-                by=f[-1]['author']['name'],
-                url=f[-1]['url'].split('http://hydr0.com')[-1],
-                sha=f[-1]['id'][:9])
+                url = f[-1]['url'].split('http://hydr0.com')[-1]
+                sha = f[-1]['id'][:9]
+            c = Commit.create(
+            info=f[-1]['message'],
+            by=f[-1]['author']['name'],
+            url=url,
+            sha=sha)
 
             b = Build.create(
                     created=time.time(),
