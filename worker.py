@@ -119,7 +119,7 @@ class Job():
         else: thread.start_new_thread(self._build, ())
 
 def main():
-    red = redis.StrictRedis()
+    red = redis.StrictRedis('hydr0.com')
     pub = red.pubsub()
     pub.subscribe('buildy.jobs')
     pub.subscribe('buildy.sys.%s' % platform.system().lower())

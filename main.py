@@ -110,11 +110,22 @@ def api(action=None):
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
             binc = max([i.bnum for i in Build.select().where(project=q[0])] or [0])+1
-            c = Commit.create(
-                info=d['commits'][-1]['message'],
-                by=d['commits'][-1]['author']['name'],
-                url=d['commits'][-1]['url'].split('http://hydr0.com')[-1],
-                sha=d['commits'][-1]['id'][:9])
+            f = d['commits']
+            if len(d['commits']) > 1:
+                url = f[-1]['url'].replace('http://', '').split('/')[:-1]
+                url = url + '/compare?from=%s&to=%s' % (f[0]['id'], f[-1]['id'])
+                c = Commit.create(
+                    info=f[-1]['message'],
+                    by=f[-1]['author']['name'],
+                    url=url,
+                    sha='%s...%s' % (f[0]['id'][:9], f[-1]['id'][:9]) )
+            else:
+                c = Commit.create(
+                info=f[-1]['message'],
+                by=f[-1]['author']['name'],
+                url=f[-1]['url'].split('http://hydr0.com')[-1],
+                sha=f[-1]['id'][:9])
+
             b = Build.create(
                     created=time.time(),
                     project=q[0], 
