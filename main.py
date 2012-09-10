@@ -13,7 +13,8 @@ build_servers = ['127.0.0.1']
 THIS_URL = "build.hydr0.com"
 BUILD_DIR = "/var/www/buildy/builds/"
 REDIS = redis.StrictRedis()
-#PUB = REDIS.pubsub()
+PUB = REDIS.pubsub()
+#PUB.subscribe('buildy.job')
 
 class Obby():
     def __init__(self, info={}):
@@ -66,6 +67,7 @@ def projectView(pid=None):
 
 def runBuild(b):
     print 'Adding build to queue!'
+    for i in 
     info = json.dumps({
         'projid':b.project.id,
         'dir':b.project.name,
@@ -73,7 +75,8 @@ def runBuild(b):
         'jobid':b.id,
         'bcode':b.code
         })
-    print ">>>", REDIS.publish('buildyjobs', info)
+    for i in ['buildy.jobs', 'buildy.arch.*', 'buildy.sys.*']:
+        REDIS.publish(i, info)
 
 def saveBuild(b, f):
     proj_dir = os.path.join(BUILD_DIR, b.project.name)

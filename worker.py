@@ -5,7 +5,7 @@ from collections import deque
 
 acpt_addr = ['127.0.0.1']
 main_addr = "build.hydr0.com"
-CUR_BUILDS = {}
+JOBS_BUILT = []
 DEBUG = False
 #cleanup = []
 #out_addr = "http://build.hydr0.com/builds/"
@@ -121,9 +121,9 @@ class Job():
 def main():
     red = redis.StrictRedis()
     pub = red.pubsub()
-    pub.subscribe('buildyjobs')
-    pub.subscribe('sys_%s' % playform.system().lower())
-    pub.subscribe('arch_%s' % platform.machine().lower())
+    pub.subscribe('buildy.jobs')
+    pub.subscribe('buildy.sys.%s' % playform.system().lower())
+    pub.subscribe('buildy.arch.%s' % platform.machine().lower())
     for i in pub.listen():
         print 'Running job...'
         try: d = json.loads(i['data'])
@@ -131,6 +131,7 @@ def main():
             print "Could not load json data: %s" % i
             continue
         try:
+            if d['jobid'] in JOBS_BUILT: continue
             with open(os.path.join('projfiles', str(d['projid'])+'.proj'), 'r') as f:
                 job = Job(d['bid'], d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
                 job.build()
