@@ -10,10 +10,10 @@ class Project(BaseModel):
     name = CharField()
     repo_name = CharField()
     git = CharField()
-    b_win = IntegerField()
-    b_fail = IntegerField()
+    b_win = IntegerField(null=True)
+    b_fail = IntegerField(null=True)
     desc = CharField()
-    active = BooleanField()
+    active = BooleanField(null=True)
 
 class Commit(BaseModel):
     info = CharField()
@@ -25,13 +25,13 @@ class Build(BaseModel):
     project = ForeignKeyField(Project, "builds")
     commit = ForeignKeyField(Commit, "builds")
     result = CharField()
-    bnum = IntegerField()
+    bnum = IntegerField(null=True)
     burl = CharField()
-    code = IntegerField()
-    finished = BooleanField()
-    success = BooleanField()
-    downloads = IntegerField()
-    time = IntegerField()
+    code = IntegerField(null=True)
+    finished = BooleanField(null=True)
+    success = BooleanField(null=True)
+    downloads = IntegerField(null=True)
+    time = IntegerField(null=True)
 
 def createStuffz():
     Project.create_table(True)
