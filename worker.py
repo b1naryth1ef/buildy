@@ -6,6 +6,7 @@ from collections import deque
 acpt_addr = ['127.0.0.1']
 main_addr = "build.hydr0.com"
 CUR_BUILDS = {}
+DEBUG = True
 #cleanup = []
 #out_addr = "http://build.hydr0.com/builds/"
 #web_dir = "/var/www/buildy/builds"
@@ -114,7 +115,8 @@ class Job():
             })
 
     def build(self):
-        thread.start_new_thread(self._build, ())
+        if DEBUG: self._build()
+        else: thread.start_new_thread(self._build, ())
 
 def main():
     red = redis.StrictRedis()
