@@ -79,7 +79,7 @@ class Job():
             
             self.action(self.info['actions'])
 
-            name = "%s_%s_%s.tar.gz" % (platform.machine().lower(), platform.system.lower(), self.buildid)
+            name = "%s_%s_%s.tar.gz" % (platform.machine().lower(), platform.system().lower(), self.buildid)
             if not self.open("tar -zcvf %s output; mv %s .." % (name)):
                 Break(self.fail("Could not package build!"))
             os.chdir(org)
