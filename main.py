@@ -135,7 +135,8 @@ def api(action=None):
             if b.success:
                 b.burl = url
                 b.project.b_win += 1
-            else: b.project.b_fail += 1
+            else: 
+                b.project.b_fail += 1
             b.project.save()
             b.save()
         else:
