@@ -39,9 +39,9 @@ def createStuffz():
     Build.create_table(True)
 
 def addProjects():
-    if not len(Project.select().where(name='2D2')):
+    if not len([i for i in Project.select().where(name='2D2')]):
         Project.create(name="2D2", repo_name="neeks_engine", desc="2DEngine2 is a game and gui engine written by neek", git="git@hydr0.com:neeks_engine.git", b_win=0, b_fail=0, active=True)
-    if not len(Project.select().where(name="B1nGoLib")):
+    if not len([i for i in Project.select().where(name="B1nGoLib")]):
         Project.create(name="B1nGoLib", repo_name="B1nGoLib", desc="A Go library I use to store snippets of code I need or use frequently", git="git@hydr0.com:b1ngolib.git", b_win=0, b_fail=0, active=True)
 
 
