@@ -13,8 +13,9 @@ CUR_BUILDS = {}
 class Break(Exception): pass
 
 class Job():
-    def __init__(self, jobid, projid, jobcode, jobdir, info):
+    def __init__(self, buildid, jobid, projid, jobcode, jobdir, info):
         self.building = False
+        self.buildid = buildid
         self.bid = jobid
         self.pid = projid
         self.bname = jobdir
@@ -77,13 +78,13 @@ class Job():
             
             self.action(self.info['actions'])
 
-            if not self.open("tar -zcvf build%s.tar.gz output; mv build%s.tar.gz .." % (self.bid, self.bid)):
+            if not self.open("tar -zcvf build%s.tar.gz output; mv build%s.tar.gz .." % (self.buildid, self.buildid)):
                 Break(self.fail("Could not package build!"))
             os.chdir(org)
 
-            self.cleanup.append('build%s.tar.gz' % self.bid)
+            self.cleanup.append('build%s.tar.gz' % self.buildid)
             
-            self.buildf = open('build%s.tar.gz' % self.bid, 'rb')
+            self.buildf = open('build%s.tar.gz' % self.buildid, 'rb')
         except:
             if self.success:
                 self.success = False
@@ -125,6 +126,6 @@ def main():
             print "Could not load json data: %s" % i
             continue
         with open(os.path.join('projfiles', str(d['projid'])+'.proj'), 'r') as f:
-            job = Job(d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
+            job = Job(d['bid'], d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
             job.build()
 main()
