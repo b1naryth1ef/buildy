@@ -88,7 +88,8 @@ class Job():
                 self.success = False
                 self.result = "Unknown build error!"
         try: self.done()
-        except: pass
+        except Exception, e:
+            print 'Done call failed: %s' % e
         finally:
             for i in self.cleanup:
                 print 'Removing %s' % i
@@ -106,7 +107,7 @@ class Job():
                 'bcode':self.bcode, 
                 'success':int(self.success), 
                 'result':self.result or "", 
-                'time':"%.2f" % time.time()-self.start
+                'time':"%.2f" % (time.time()-self.start)
             })
 
     def build(self):
