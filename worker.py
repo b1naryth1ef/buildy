@@ -5,6 +5,7 @@ from collections import deque
 
 acpt_addr = ['127.0.0.1']
 main_addr = "build.hydr0.com"
+CUR_BUILDS = {}
 #cleanup = []
 #out_addr = "http://build.hydr0.com/builds/"
 #web_dir = "/var/www/buildy/builds"
@@ -12,11 +13,12 @@ main_addr = "build.hydr0.com"
 class Break(Exception): pass
 
 class Job():
-    def __init__(self, bid, bcode, bdir, info):
+    def __init__(self, jobid, projid, jobcode, jobdir, info):
         self.building = False
-        self.bid = bid
-        self.bname = bdir
-        self.bcode = bcode
+        self.bid = jobid
+        self.pid = projid
+        self.bname = jobdir
+        self.bcode = jobcode
         self.info = info
         self.buildf = None
 
@@ -25,6 +27,8 @@ class Job():
 
         self.success = True
         self.result = None
+
+        self.start = 0
 
     def open(self, cmd, **kwargs):
         nice = kwargs.get('nice')
@@ -51,6 +55,7 @@ class Job():
         else: return True
 
     def _build(self):
+        self.start = time.time()
         org = os.getcwd()
         d = os.path.join(org, self.info['dir'])
         self.building = True
@@ -99,6 +104,7 @@ class Job():
                 'bcode':self.bcode, 
                 'success':int(self.success), 
                 'result':self.result or "", 
+                'time':time.time()-self.start()
             })
 
     def build(self):
@@ -109,29 +115,12 @@ def main():
     pub = red.pubsub()
     pub.subscribe('buildyjobs')
     for i in pub.listen():
-        print i
-
-def serverThread():
-    global sock
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("127.0.0.1", 7660))
-    sock.listen(2)
-    while True:
-        client, addr = sock.accept()
-        if not addr[0] in acpt_addr: 
-            print 'Denied from %s' % addr
-            client.close()
+        print 'Running job...'
+        try: d = json.loads(i['data'])
+        except: 
+            print "Could not load json data: %s" % i
             continue
-        data = client.recv(2048)
-        if data:
-            if 1==1:
-                data = json.loads(data)
-                if data['a'] == "build":
-                    print 'Building!'
-                    with open(os.path.join('projfiles', str(data['id'])+'.proj'), 'r') as f:
-                        b = Job(data['job'], data['bcode'], data['dir'], json.load(f))
-                        b.build()
-            #except:
-            #    print 'Faild!'
-            #    client.close()
+        with open(os.path.join('projfiles', str(data['projid'])+'.proj'), 'r') as f:
+            job = Job(d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
+            job.build()
 main()

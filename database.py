@@ -15,18 +15,23 @@ class Project(BaseModel):
     desc = CharField()
     active = BooleanField()
 
+class Commit(BaseModel):
+    info = CharField()
+    sha = CharField()
+    by = CharField()
+    url = CharField()
+
 class Build(BaseModel):
     project = ForeignKeyField(Project, "builds")
+    commit = ForeignKeyField(Commit, "builds")
     result = CharField()
-    commit = CharField()
-    commit_by = CharField()
-    commit_url = CharField()
     bnum = IntegerField()
     burl = CharField()
     code = IntegerField()
     finished = BooleanField()
     success = BooleanField()
     downloads = IntegerField()
+    time = IntegerField()
 
 def createStuffz():
     Project.create_table(True)

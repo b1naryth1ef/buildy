@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, make_response, redirect, flash
 import sys, os, time, random, socket, json
-from database import Project, Build
+from database import Project, Build, Commit
 from werkzeug import secure_filename
 import redis
 
@@ -67,10 +67,9 @@ def projectView(pid=None):
 def runBuild(b):
     print 'Adding build to queue!'
     REDIS.publish('buildyjobs', json.dumps({
-        'a':'build',
-        'id':b.project.id,
+        'projid':b.project.id,
         'dir':b.project.name,
-        'job':b.id,
+        'jobid':b.id,
         'bcode':b.code
         }))
     # print 'Sending build to worker...',
@@ -105,13 +104,17 @@ def api(action=None):
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
             binc = max([i.bnum for i in Build.select().where(project=q[0])] or [0])+1
+            c = Commit.create(
+                info=d['commits'][-1]['message'],
+                by=d['commits'][-1]['author']['name'],
+                url=d['commits'][-1]['url'],
+                sha=d['commits'][-1]['id'][:9]
+                )
             b = Build.create(
                     project=q[0], 
                     bnum=binc, 
                     code=random.randint(1000, 9999),
-                    commit=d['commits'][-1]['message'],
-                    commit_by=d['commits'][-1]['author']['name'],
-                    commit_url=d['commits'][-1]['url'].split('http://hydr0.com')[-1])
+                    commit=c)
             runBuild(b)
         else:
             print 'Invalid build info!', d, q
@@ -128,6 +131,7 @@ def api(action=None):
             b.finished = True
             b.success = bool(int(request.form['success']))
             b.result = request.form['result']
+            b.time = request.form['time']
             if b.success:
                 b.burl = url
                 b.project.b_win += 1
