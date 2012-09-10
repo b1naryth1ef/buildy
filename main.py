@@ -38,7 +38,7 @@ def getStats():
                 else: statsc.total_fail += 1
             else:
                 statsc.total_building += 1
-            statsc.total_downloads += i.downloads
+            statsc.total_downloads += i.downloads or 0
     return statsc
 getStats()
 
