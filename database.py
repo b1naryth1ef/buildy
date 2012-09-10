@@ -32,6 +32,7 @@ class Build(BaseModel):
     success = BooleanField(null=True)
     downloads = IntegerField(null=True)
     time = CharField(null=True)
+    created = IntegerField(null=True)
 
 def createStuffz():
     Project.create_table(True)

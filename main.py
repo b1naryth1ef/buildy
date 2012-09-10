@@ -81,6 +81,18 @@ def saveBuild(pname, f):
     f.save(os.path.join(p, f.filename))
     return os.path.join(THIS_URL, 'builds', pname, f.filename)
 
+def findStalled():
+    q = [i for i in Build.select().where(finished=False) if time.time()-i.created >= 600]
+    if len(q):
+        print "Removing %s stalled builds!" % len(q)
+        for i in q:
+            i.finished = True
+            i.success = False
+            i.result = "Build timed out!"
+            i.project.b_fail += 1
+            i.project.save()
+            i.save()
+
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
     global statsc
@@ -89,6 +101,7 @@ def api(action=None):
         print request.form.keys()
         print request.json
     elif action == "gitlab":
+        findStalled()
         d = request.json
         q = [i for i in Project.select().where(repo_name=d['repository']['name'], active=True)]
         if len(q):
@@ -99,6 +112,7 @@ def api(action=None):
                 url=d['commits'][-1]['url'].split('http://hydr0.com')[-1],
                 sha=d['commits'][-1]['id'][:9])
             b = Build.create(
+                    created=time.time(),
                     project=q[0], 
                     bnum=binc, 
                     code=random.randint(1000, 9999),

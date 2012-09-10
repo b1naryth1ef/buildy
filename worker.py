@@ -125,7 +125,11 @@ def main():
         except: 
             print "Could not load json data: %s" % i
             continue
-        with open(os.path.join('projfiles', str(d['projid'])+'.proj'), 'r') as f:
-            job = Job(d['bid'], d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
-            job.build()
+        try:
+            with open(os.path.join('projfiles', str(d['projid'])+'.proj'), 'r') as f:
+                job = Job(d['bid'], d['jobid'], d['projid'], d['bcode'], d['dir'], json.load(f))
+                job.build()
+        except:
+            print "Could not load projfiles: %s" % d
+            continue
 main()
