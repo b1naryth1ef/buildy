@@ -87,10 +87,12 @@ class Job():
             if self.success:
                 self.success = False
                 self.result = "Unknown build error!"
-        self.done()
-        for i in self.cleanup:
-            print 'Removing %s' % i
-            self.open('rm -rf %s' % i)
+        try: self.done()
+        except: pass
+        finally:
+            for i in self.cleanup:
+                print 'Removing %s' % i
+                self.open('rm -rf %s' % i)
 
     def done(self):
         print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
@@ -104,7 +106,7 @@ class Job():
                 'bcode':self.bcode, 
                 'success':int(self.success), 
                 'result':self.result or "", 
-                'time':time.time()-self.start
+                'time':int(time.time()-self.start)
             })
 
     def build(self):
