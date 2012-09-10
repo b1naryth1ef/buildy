@@ -7,26 +7,26 @@ class BaseModel(Model):
         database = database
 
 class Project(BaseModel):
-    name = CharField()
-    repo_name = CharField()
-    git = CharField()
+    name = CharField(null=True)
+    repo_name = CharField(null=True)
+    git = CharField(null=True)
     b_win = IntegerField(null=True)
     b_fail = IntegerField(null=True)
-    desc = CharField()
+    desc = CharField(null=True)
     active = BooleanField(null=True)
 
 class Commit(BaseModel):
-    info = CharField()
-    sha = CharField()
-    by = CharField()
-    url = CharField()
+    info = CharField(null=True)
+    sha = CharField(null=True)
+    by = CharField(null=True)
+    url = CharField(null=True)
 
 class Build(BaseModel):
     project = ForeignKeyField(Project, "builds")
     commit = ForeignKeyField(Commit, "builds")
-    result = CharField()
+    result = CharField(null=True)
     bnum = IntegerField(null=True)
-    burl = CharField()
+    burl = CharField(null=True)
     code = IntegerField(null=True)
     finished = BooleanField(null=True)
     success = BooleanField(null=True)
