@@ -13,7 +13,7 @@ build_servers = ['127.0.0.1']
 THIS_URL = "build.hydr0.com"
 BUILD_DIR = "/var/www/buildy/builds/"
 REDIS = redis.StrictRedis()
-PUB = redis.pubsub()
+PUB = REDIS.pubsub()
 
 class Obby():
     def __init__(self, info={}):
