@@ -123,7 +123,7 @@ def api(action=None):
 
         if len(b):
             b = b[0]
-            'http://'+url = saveBuild(b.project.name, f)
+            url = 'http://'+saveBuild(b.project.name, f)
             b.finished = True
             b.success = bool(int(request.form['success']))
             b.result = request.form['result']
