@@ -73,7 +73,7 @@ def runBuild(b):
         'jobid':b.id,
         'bcode':b.code
         })
-    REDIS.publish('buildyjobs', info)
+    print ">>>", REDIS.publish('buildyjobs', info)
 
 def saveBuild(b, f):
     proj_dir = os.path.join(BUILD_DIR, b.project.name)

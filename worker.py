@@ -122,6 +122,8 @@ def main():
     red = redis.StrictRedis()
     pub = red.pubsub()
     pub.subscribe('buildyjobs')
+    pub.subscribe('sys_%s' % playform.system().lower())
+    pub.subscribe('arch_%s' % platform.machine().lower())
     for i in pub.listen():
         print 'Running job...'
         try: d = json.loads(i['data'])
