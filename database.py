@@ -37,8 +37,14 @@ def createStuffz():
     Project.create_table(True)
     Commit.create_table(True)
     Build.create_table(True)
-    test = Project.create(name="2D2", repo_name="neeks_engine", desc="2DEngine2 is a game and gui engine written by neek", git="git@hydr0.com:neeks_engine.git", b_win=0, b_fail=0, active=True)
-    test2 = Project.create(name="MCL33tz", repo_name="MCL33tz", desc="A minecraft client mod that we use to hax nubs and make them babies ragequit", git="git@hydr0.com:mcl33tz.git", b_win=0, b_fail=0, active=True)
+
+def addProjects():
+    if not len(project.select().where(name='2D2')):
+        Project.create(name="2D2", repo_name="neeks_engine", desc="2DEngine2 is a game and gui engine written by neek", git="git@hydr0.com:neeks_engine.git", b_win=0, b_fail=0, active=True)
+    if not len(project.select().where(name="B1nGoLib")):
+        Project.create(name="B1nGoLib", repo_name="B1nGoLib", desc="A Go library I use to store snippets of code I need or use frequently", git="git@hydr0.com:b1ngolib.git", b_win=0, b_fail=0, active=True)
+
 
 if __name__ == '__main__':
     createStuffz()
+    addProjects()
