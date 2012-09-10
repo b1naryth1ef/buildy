@@ -112,7 +112,7 @@ def api(action=None):
             binc = max([i.bnum for i in Build.select().where(project=q[0])] or [0])+1
             f = d['commits']
             if len(d['commits']) > 1:
-                url = f[-1]['url'].replace('http://', '').split('/')[:-1]
+                url = '/'.join(f[-1]['url'].replace('http://hydr0.com', '').split('/')[:-1])
                 url = url + '/compare?from=%s&to=%s' % (f[0]['id'], f[-1]['id'])
                 c = Commit.create(
                     info=f[-1]['message'],
