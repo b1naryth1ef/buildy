@@ -70,7 +70,7 @@ def runBuild(b):
         'projid':b.project.id,
         'dir':b.project.name,
         'bid':b.bnum,
-        'jobid':b.id
+        'jobid':b.id,
         'bcode':b.code
         }))
     # print 'Sending build to worker...',
