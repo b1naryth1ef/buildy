@@ -73,25 +73,13 @@ def runBuild(b):
         'jobid':b.id,
         'bcode':b.code
         }))
-    # print 'Sending build to worker...',
-    # c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # c.connect((random.choice(build_servers), 7660))
-    # c.send(json.dumps({
-    #     'a':'build',
-    #     'id':b.project.id,
-    #     'dir':b.project.name,
-    #     'job':b.id,
-    #     'bcode':b.code
-    #     }))
-    # c.close()
-    # print 'SENT!'
 
 def saveBuild(pname, f):
     p = os.path.join(BUILD_DIR, pname)
     if not os.path.exists(p):
         os.mkdir(p)
     f.save(os.path.join(p, f.filename))
-    return os.path.join(THIS_URL, pname, f.filename)
+    return os.path.join(THIS_URL, 'builds', pname, f.filename)
 
 @app.route('/api/<action>/', methods=['POST'])
 def api(action=None):
