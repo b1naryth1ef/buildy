@@ -66,20 +66,22 @@ def projectView(pid=None):
 
 def runBuild(b):
     print 'Adding build to queue!'
-    REDIS.publish('buildyjobs', json.dumps({
+    info = json.dumps({
         'projid':b.project.id,
         'dir':b.project.name,
         'bid':b.bnum,
         'jobid':b.id,
         'bcode':b.code
-        }))
+        })
+    REDIS.publish('buildyjobs', info)
 
-def saveBuild(pname, f):
-    p = os.path.join(BUILD_DIR, pname)
-    if not os.path.exists(p):
-        os.mkdir(p)
-    f.save(os.path.join(p, f.filename))
-    return os.path.join(THIS_URL, 'builds', pname, f.filename)
+def saveBuild(b, f):
+    proj_dir = os.path.join(BUILD_DIR, b.project.name)
+    if not os.path.exists(proj_dir): os.mkdir(proj_dir)
+    build_dir = os.path.join(BUILD_DIR, proj_dir, b.bnum)
+    if not os.path.exists(build_dir): os.mkdir(build_dir)
+    f.save(os.path.join(build_dir, f.filename))
+    return os.path.join(THIS_URL, 'builds', b.project.name, b.bnum)
 
 def findStalled():
     q = [i for i in Build.select().where(finished=False) if time.time()-i.created >= 600]
@@ -129,7 +131,8 @@ def api(action=None):
 
         if len(b):
             b = b[0]
-            url = 'http://'+saveBuild(b.project.name, f)
+            url = 'http://'+saveBuild(b, f)
+            if b.finished == True: return ":3" #Cross compile stuffs
             b.finished = True
             b.success = bool(int(request.form['success']))
             b.result = request.form['result']

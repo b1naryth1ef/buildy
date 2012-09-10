@@ -3,6 +3,7 @@
   "git": "git@hydr0.com:b1ngolib.git",
   "dir": "b1ngolib",
   "type": "dynamic",
+  "cross": false,
   "actions":[
     {
       "action": "go build",

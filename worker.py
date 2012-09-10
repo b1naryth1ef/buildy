@@ -1,5 +1,5 @@
 import sys, os, time
-import socket, json, thread, urllib2
+import socket, json, thread, urllib2, platform
 import requests, subprocess, redis
 from collections import deque
 
@@ -78,13 +78,14 @@ class Job():
             
             self.action(self.info['actions'])
 
-            if not self.open("tar -zcvf build%s.tar.gz output; mv build%s.tar.gz .." % (self.buildid, self.buildid)):
+            name = "%s_%s_%s.tar.gz" % (platform.machine().lower(), platform.system.lower(), self.buildid)
+            if not self.open("tar -zcvf %s output; mv %s .." % (name)):
                 Break(self.fail("Could not package build!"))
             os.chdir(org)
 
-            self.cleanup.append('build%s.tar.gz' % self.buildid)
+            self.cleanup.append(name)
             
-            self.buildf = open('build%s.tar.gz' % self.buildid, 'rb')
+            self.buildf = open(name, 'rb')
         except:
             if self.success:
                 self.success = False

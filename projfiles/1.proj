@@ -3,6 +3,7 @@
   "git": "git@hydr0.com:neeks_engine.git",
   "dir": "neeks_engine",
   "type":"dynamic",
+  "cross": true,
   "actions": [
     {
       "action": "chmod +x build", 
