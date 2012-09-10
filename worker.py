@@ -95,7 +95,7 @@ class Job():
                 self.open('rm -rf %s' % i)
 
     def done(self):
-        print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
+        print 'Build finished in %ss... Success: %s | Result: %s' % (time.time()-self.start, self.success, self.result)
         self.building = False
         if self.buildf: files = {'build':self.buildf}
         else: files = {}
