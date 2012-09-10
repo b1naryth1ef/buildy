@@ -55,7 +55,7 @@ class Job():
         d = os.path.join(org, self.info['dir'])
         self.building = True
         setup = False
-        if 1==1:
+        try:
             if not os.path.exists(d) or self.info['type'] == 'dynamic':
                 if not self.open('git clone %s' % self.info['git']):
                     raise Break(self.fail("Could not clone git repo!"))
@@ -78,22 +78,19 @@ class Job():
             self.cleanup.append('build%s.tar.gz' % self.bid)
             self.cleanup.append(self.info['dir'])
             self.buildf = open('build%s.tar.gz' % self.bid, 'rb')
-
-        #except:
-        #    if self.success:
-        #        self.success = False
-        #        self.result = "Unknown build error!"
+        except:
+            if self.success:
+                self.success = False
+                self.result = "Unknown build error!"
         self.done()
         for i in self.cleanup:
             print 'Removing %s' % i
             self.open('rm -rf %s' % i)
 
-
     def done(self):
         print 'Build finished... Success: %s | Result: %s' % (self.success, self.result)
         self.building = False
-        if self.buildf:
-            files = {'build':self.buildf}
+        if self.buildf: files = {'build':self.buildf}
         else: files = {}
         requests.post('http://'+main_addr+'/api/buildfin/', 
             files=files,
@@ -103,10 +100,16 @@ class Job():
                 'success':int(self.success), 
                 'result':self.result or "", 
             })
-        print 'Done!\n'
 
     def build(self):
         thread.start_new_thread(self._build, ())
+
+def main():
+    red = redis.StrictRedis()
+    pub = red.pubsub()
+    pub.subscribe('buildyjobs')
+    for i in pub.listen():
+        print i
 
 def serverThread():
     global sock
@@ -131,6 +134,4 @@ def serverThread():
             #except:
             #    print 'Faild!'
             #    client.close()
-try: serverThread()
-except KeyboardInterrupt: 
-    sock.close()
+main()

@@ -11,6 +11,8 @@ build_servers = ['127.0.0.1']
 
 THIS_URL = "build.hydr0.com"
 BUILD_DIR = "/var/www/buildy/builds/"
+REDIS = redis.StrictRedis()
+PUB = redis.pubsub()
 
 class Obby():
     def __init__(self, info={}):
@@ -62,18 +64,26 @@ def projectView(pid=None):
     return redirect(url_for('index'))
 
 def runBuild(b):
-    print 'Sending build to worker...',
-    c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    c.connect((random.choice(build_servers), 7660))
-    c.send(json.dumps({
+    print 'Adding build to queue!'
+    PUB.publish('buildyjobs', json.dumps({
         'a':'build',
         'id':b.project.id,
         'dir':b.project.name,
         'job':b.id,
         'bcode':b.code
         }))
-    c.close()
-    print 'SENT!'
+    # print 'Sending build to worker...',
+    # c = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # c.connect((random.choice(build_servers), 7660))
+    # c.send(json.dumps({
+    #     'a':'build',
+    #     'id':b.project.id,
+    #     'dir':b.project.name,
+    #     'job':b.id,
+    #     'bcode':b.code
+    #     }))
+    # c.close()
+    # print 'SENT!'
 
 def saveBuild(pname, f):
     p = os.path.join(BUILD_DIR, pname)
@@ -113,7 +123,7 @@ def api(action=None):
 
         if len(b):
             b = b[0]
-            url = saveBuild(b.project.name, f)
+            'http://'+url = saveBuild(b.project.name, f)
             b.finished = True
             b.success = bool(int(request.form['success']))
             b.result = request.form['result']
