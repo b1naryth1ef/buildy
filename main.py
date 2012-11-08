@@ -175,6 +175,7 @@ def addBuild(b):
     print 'Pushed build #%s' % b.id
 
 def saveBuild(b, f):
+    if not f: return
     proj_dir = os.path.join(BUILD_DIR, b.project.name)
     if not os.path.exists(proj_dir): os.mkdir(proj_dir)
     build_dir = os.path.join(BUILD_DIR, proj_dir, str(b.build_id))
