@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for, make_response, redir
 import sys, os, time, random, socket, json
 from database import Project, Build, Commit, User
 from werkzeug import secure_filename
+from datetime import datetime
 import redis, bcrypt
 
 app = Flask(__name__)
