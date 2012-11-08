@@ -54,8 +54,9 @@ class Project(BaseModel):
         return winpc, failpc
 
     def getCommits(self):
-        self.commits.reverse()
-        return self.commits
+        q = [i for i in self.commits]
+        q.reverse()
+        return q
 
 class Commit(BaseModel):
     project = ForeignKeyField(Project, related_name="commits")

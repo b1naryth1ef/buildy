@@ -46,7 +46,7 @@ class BuildJob():
             print '--> BUILD SUCCESS <--'
             files = {'build':out}
         requests.post('http://'+main_addr+'/api/put_build',
-            files=files 
+            files=files,
             data={
                 'pid':self.pid, 
                 'id':self.id,
