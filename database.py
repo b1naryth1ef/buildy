@@ -53,6 +53,10 @@ class Project(BaseModel):
         failpc = 100*(len([i for i in builds if i.success == False]))/(len(builds))
         return winpc, failpc
 
+    def getCommits(self):
+        self.commits.reverse()
+        return self.commits
+
 class Commit(BaseModel):
     project = ForeignKeyField(Project, related_name="commits")
     info = CharField(null=True)

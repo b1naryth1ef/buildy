@@ -37,21 +37,24 @@ class BuildJob():
 
     def endJob(self, msg, failed=False, out=None):
         self.result.append(msg)
-        data={
-            'pid':self.pid, 
-            'id':self.id,
-            'success':int(self.success), 
-            'result':'\n'.join(self.result), 
-            'output':'\n'.join(self.output),
-            'time':"%s" % (time.time()-self.startTime)}
         if failed:
+            self.success = False
             print '--> BUILD FAILURE <--'
             print '\n  '.join(['--------']+self.result)
-            requests.post('http://'+main_addr+'/api/put_build', data=data)
+            files = {}
         else:
             print '--> BUILD SUCCESS <--'
-            requests.post('http://'+main_addr+'/api/put_build', data=data, files={'build':out})
-        
+            files = {'build':out}
+        requests.post('http://'+main_addr+'/api/put_build',
+            files=files 
+            data={
+                'pid':self.pid, 
+                'id':self.id,
+                'success':int(self.success), 
+                'result':'\n'.join(self.result), 
+                'output':'\n'.join(self.output),
+                'time':"%s" % (time.time()-self.startTime)})
+    
     def startJob(self):
         if not os.path.exists(self.tmpdir):
             self.msg('Cloning git repo... ')

@@ -56,6 +56,7 @@ def buildView(id=None):
     v = getView()
     if not id: redirect('/')
     q = [i for i in Build.select().where(Build.id==id)]
+    q.reverse()
     if not len(q):
         return flashy('/', 'No build with ID #%s' % id, 'error')
     v.build = q[0]

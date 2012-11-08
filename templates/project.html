@@ -52,7 +52,7 @@
                                         {% endif %}
                                     </li>
 
-                                    <li class="ticket-data-age">16 hours</li>
+                                    <li class="ticket-data-age">{{ b.getCreated() }}</li>
                                     <li class="ticket-data-user"><strong><a class="btn btn-success btn-small" href="{{ b.build_url }}">Downlaod</a></strong>
                                     </li>
                                 </ul>
@@ -61,8 +61,8 @@
                                 <dl>
                                     <dt>Created:</dt>
                                     <dd><strong>{{ b.getCreated() }}</strong></dd>
-                                    <dt>Finished:</dt>
-                                    <dd><strong>{{ b.getFinished() }}</strong></dd>
+                                    <dt>Duration:</dt>
+                                    <dd><strong>{{ b.getDuration() }}</strong></dd>
                                     <dt>Pushed By:</dt>
                                     <dd><strong>{{ b.commit.author }}</strong></dd>
                                     <dt>Commit SHA:</dt>
@@ -70,6 +70,7 @@
                                 </dl>
                                 <h5>Result: </h5>
                                 <p>{{ b.result|safe }}</p>
+                                <br />
                                 <a href="#" data-toggle="collapse" data-target="#build{{ loop.index }}" class="btn btn-alt">Close</a>
                             </div>
                         </li>
@@ -113,7 +114,7 @@
                 <h2>Git Commits</h2>
             </header>
             <section>
-                {% for comm in v.proj.commits %}
+                {% for comm in v.proj.getCommits() %}
                 <div class="entry">
                     <h4 class="entry-header"><span class="awe-github"></span><a href="{{ comm.url }}"><code>{{ comm.getShort() }}</code></a>: {{ comm.info }}</h4>
                 </div>
