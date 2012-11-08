@@ -37,7 +37,7 @@ class BuildJob():
         self.result.append(msg)
         if failed:
             print '--> BUILD FAILURE <--'
-            print '\n  '.join(self.result)
+            print '\n  '.join(['--------']+self.result)
             files = []
         else:
             print '--> BUILD SUCCESS <--'

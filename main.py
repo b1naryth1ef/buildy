@@ -77,25 +77,20 @@ def apiRoute(action=None):
         d = request.json
         q = [i for i in Project.select().where((Project.repo_name==request.json['repository']['name']) &(Project.active==True))]
         if len(q):
-            f = request.json['commits']
-            if len(f) > 1: #@TODO fix this maybs?
-                url = '/'.join(f[-1]['url'].replace('http://hydr0.com', '').split('/')[:-1])
-                url = url + '/compare?from=%s&to=%s' % (f[0]['id'], f[-1]['id'])
-                sha = '%s...%s' % (f[0]['id'][:9], f[-1]['id'][:9]) 
-            else:
-                url = f[-1]['url'].split('http://hydr0.com')[-1]
-                sha = f[-1]['id'][:9]
-            c = Commit(
-                project=q[0],
-                info=f[-1]['message'],
-                author=f[-1]['author']['name'],
-                url=url,
-                sha=sha)
-            c.save()
-
+            commits = []
+            for i in request.json['commits']:
+                if len([i for i in Commit.select().where((Commit.sha==i['id'][:6]))]): continue
+                c = Commit(
+                    project=q[0],
+                    info=i['message'],
+                    author=i['author']['name'],
+                    url=i['url'].split('http://hydr0.com')[-1]),
+                    sha=i['id'][:6])
+                c.save()
+                commits.append(c)
             b = Build(
                 project=q[0],
-                commit=c,
+                commit=commits[-1],
                 build_id=q[0].getBuildId(),
                 built=False,
                 time=datetime.now())
@@ -103,6 +98,7 @@ def apiRoute(action=None):
             addBuild(b)
         else:
             print 'Invalid build info!', d, q
+    return ':3'
 
 @app.route('/admin_action/<action>', methods=['POST'])
 @app.route('/admin_action/<action>/<id>')

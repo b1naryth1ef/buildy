@@ -95,11 +95,6 @@ if __name__ == '__main__':
     if not len([i for i in User.select()]):
         u = User(username="root", password=bcrypt.hashpw('admin', bcrypt.gensalt()))
         u.save()
-        m = Project(name='Test', author=u, desc="This is a test", url="http://google.com/", repo_name="test", repo_type="gl", repo_url="git@test.com:git.git")
+        m = Project(name='Neeks Engine', author=u, desc="An awesome 2D engine based on Allegro and Chipmunk, written in C.", 
+            url="http://git.hydr0.com/neeks_engine", repo_name="neeks_engine", repo_type="gl", repo_url="git@hydr0.com:neeks_engine.git")
         m.save()
-        c = Commit(project=m, info="Updated blah and fixed blah. Represents version 3.5.", sha="589daj93sd93jsdf", author="B1naryTh1ef", url="http://test.com/")
-        c.save()
-        b = Build(project=m, commit=c, build_id=0, build_url="http://google.com/buildy", built=True, success=True, time=datetime.now())
-        b.save()
-        b = Build(project=m, commit=c, build_id=1, build_url="http://google.com/buildy", built=True, success=False, time=datetime.now())
-        b.save()
