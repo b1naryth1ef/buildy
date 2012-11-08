@@ -1,6 +1,7 @@
 import sys, os, time
 import socket, json, thread, urllib2, platform
 import requests, subprocess, redis
+import popen2
 from collections import deque
 
 acpt_addr = ['127.0.0.1']
@@ -19,9 +20,9 @@ class BuildJob():
         self.building = False
         self.success = True
         self.result = []
+        self.output = []
 
         self.startTime = 0
-        self.totalTime = 0
 
     def msg(self, msg, add=False):
         if not add:
@@ -30,67 +31,69 @@ class BuildJob():
 
     def open(self, cmd, **kwargs):
         kwargs['shell'] = True
-        res = subprocess.Popen(cmd, **kwargs).wait()
+        p = subprocess.Popen(cmd, **kwargs)
+        res = p.wait()
         return not res
 
     def endJob(self, msg, failed=False, out=None):
         self.result.append(msg)
+        data={
+            'pid':self.pid, 
+            'id':self.id,
+            'success':int(self.success), 
+            'result':'\n'.join(self.result), 
+            'output':'\n'.join(self.output),
+            'time':"%s" % (time.time()-self.startTime)}
         if failed:
             print '--> BUILD FAILURE <--'
             print '\n  '.join(['--------']+self.result)
-            files = []
+            requests.post('http://'+main_addr+'/api/put_build', data=data)
         else:
             print '--> BUILD SUCCESS <--'
-            files = [out]
-        requests.post('http://'+main_addr+'/api/put_build/',
-            files=files,
-            data={
-                'pid':self.pid, 
-                'id':self.id,
-                'success':int(self.success), 
-                'result':'\n'.join(self.results), 
-                'time':"%s" % (time.time()-self.start)})
-        os.chdir('../..')
-
+            requests.post('http://'+main_addr+'/api/put_build', data=data, files={'build':out})
+        
     def startJob(self):
         if not os.path.exists(self.tmpdir):
-            self.msg('Project temp directory does not exist; creating... ')
-            try: os.mkdir(self.tmpdir)
-            except:
+            self.msg('Cloning git repo... ')
+            if not self.open('git clone %s ./tmp/project%s' % (self.url, self.pid)):
                 self.msg('[FAILED]', True)
-                self.endJob("Problem creating temporary build directory (perm issues?)", failed=True)
-            self.msg('[DONE', True)
-        os.chdir(self.tmpdir)
-        self.msg('Stashing local changes (just in case)... ')
-        if not self.open('git stash'):
-            self.msg('[FAILED]', True)
-            self.endJob('Could not stash local changes (git problems?)', failed=True)
-        self.msg('[DONE]', True)
-        self.msg('Pulling latest version from git... ')
-        if not self.open('git pull origin master'): #Eventually support moar branches
-            self.msg('[FAILED]', True)
-            self.endJob('Could not pull from git (git problems?)', failed=True)
-        self.msg('[DONE]', True)
+                return self.endJob('Could not clone git repository!')
+            os.chdir(self.tmpdir)
+            self.msg('[DONE]', True)
+        else:
+            os.chdir(self.tmpdir)
+            self.msg('Stashing local changes (just in case)... ')
+            if not self.open('git stash'):
+                self.msg('[FAILED]', True)
+                return self.endJob('Could not stash local changes (git problems?)', failed=True)
+            self.msg('[DONE]', True)
+            self.msg('Pulling latest version from git... ')
+            if not self.open('git pull origin master'): #Eventually support moar branches
+                self.msg('[FAILED]', True)
+                return self.endJob('Could not pull from git (git problems?)', failed=True)
+            self.msg('[DONE]', True)
         if os.path.exists('cleanup.sh'):
             self.msg('Found cleanup script, running it... ')
-            if not self.open('cleanup.sh'):
+            if not self.open('./cleanup.sh'):
                 self.msg('[FAILED]', True)
-                self.endJob('Cleanup script failed!', failed=True)
+                return self.endJob('Cleanup script failed!', failed=True)
             self.msg('[DONE]', True)
         if os.path.exists('build.sh'):
             self.msg('Found build script, running it... ')
-            if not self.open('build.sh'):
+            if not self.open('./build.sh'):
                 self.msg('[FAILED]', True)
-                self.endJob('Build script failed!', failed=True)
+                return self.endJob('Build script failed!', failed=True)
             self.msg('[DONE]', True)
-        else: self.endJob('No build script found!', failed=True)
+        else: return self.endJob('No build script found!', failed=True)
         #@TODO Add test script?
         self.msg('Packaging build results... ')
+        os.chdir('..')
         name = "%s_%s_%s_%s.tar.gz" % (platform.machine().lower(), platform.system().lower(), self.pid, self.id)
-        if not self.open("tar -zcvf %s output" % (name, name)):
+        if not self.open("tar -zcvf %s output" % (name)):
             self.msg('[FAILED]', True)
-            self.endJob('Could not package build results!', failed=True)
+            return self.endJob('Could not package build results!', failed=True)
         self.endJob('Build #%s of %s built with 0 errors!' % (self.id, self.pid), out=name)
+        os.chdir('..')
 
 def main():
     red = redis.Redis('hydr0.com')
@@ -102,5 +105,6 @@ def main():
             print 'Could not load json data: %s' % str(build)
             continue
         b = BuildJob(build['id'], build['pid'], build['git'])
-        thread.start_new_thread(b.startJob, ())
+        b.startJob()
+        #thread.start_new_thread(b.startJob, ())
 main()

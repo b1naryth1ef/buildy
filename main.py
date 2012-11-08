@@ -72,7 +72,19 @@ def adminView():
 @app.route('/api/<action>', methods=['POST'])
 def apiRoute(action=None):
     if action == 'put_build':
-        print request.form
+        q = [i for i in Build.select().where((Build.build_id == request.form.get('id')) & (Build.built==False) & (Build.project.id==request.form.get('pid')))]
+        if not len(q): return
+        b = q[0]
+        b.success = bool(int(request.form.get('success')))
+        b.result = request.form.get('result')
+        b.finish_time = datetime.now()
+        f = request.files.get('build')
+        if not f or not f.filename.endswith('.tar.gz'):
+            print "Invalid file!"
+            return
+        b.build_url = 'http://'+saveBuild(b, f)
+        b.save()
+
     if action == 'gitlab':
         d = request.json
         q = [i for i in Project.select().where((Project.repo_name==request.json['repository']['name']) &(Project.active==True))]
@@ -162,13 +174,13 @@ def addBuild(b):
     REDIS.rpush('buildy.builds', info)
     print 'Pushed build #%s' % b.id
 
-# def saveBuild(b, f):
-#     proj_dir = os.path.join(BUILD_DIR, b.project.name)
-#     if not os.path.exists(proj_dir): os.mkdir(proj_dir)
-#     build_dir = os.path.join(BUILD_DIR, proj_dir, str(b.bnum))
-#     if not os.path.exists(build_dir): os.mkdir(build_dir)
-#     f.save(os.path.join(build_dir, f.filename))
-#     return os.path.join(THIS_URL, 'builds', b.project.name, str(b.bnum))
+def saveBuild(b, f):
+    proj_dir = os.path.join(BUILD_DIR, b.project.name)
+    if not os.path.exists(proj_dir): os.mkdir(proj_dir)
+    build_dir = os.path.join(BUILD_DIR, proj_dir, str(b.bnum))
+    if not os.path.exists(build_dir): os.mkdir(build_dir)
+    f.save(os.path.join(build_dir, f.filename))
+    return os.path.join(THIS_URL, 'builds', b.project.name, str(b.bnum))
 
 # @app.route('/api/<action>/', methods=['POST'])
 # def api(action=None):

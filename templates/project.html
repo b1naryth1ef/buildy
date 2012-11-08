@@ -115,7 +115,7 @@
             <section>
                 {% for comm in v.proj.commits %}
                 <div class="entry">
-                    <h4 class="entry-header"><span class="awe-github"></span> {{ comm.info }} -- <a href="{{ comm.url }}"><code>{{ comm.getShort() }}</code></a></h4>
+                    <h4 class="entry-header"><span class="awe-github"></span><a href="{{ comm.url }}"><code>{{ comm.getShort() }}</code></a>: {{ comm.info }}</h4>
                 </div>
                 {% endfor %}             
             </section>

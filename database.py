@@ -84,6 +84,11 @@ class Build(BaseModel):
             return niceDate(self.finish_time)+" ago"
         return 'Unfinished'
 
+    def getDuration(self):
+        if self.time and self.finish_time:
+            return niceDate(self.finish_time, fromDate=self.time)
+        return ''
+
 def createStuffz():
     User.create_table(True)
     Project.create_table(True)
