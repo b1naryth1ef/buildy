@@ -55,6 +55,7 @@ class BuildJob():
                 'result':'\n'.join(self.result), 
                 'output':'\n'.join(self.output),
                 'time':"%s" % (time.time()-self.startTime)})
+        os.chdir('../..')
     
     def startJob(self):
         if not os.path.exists(self.tmpdir):
@@ -93,13 +94,12 @@ class BuildJob():
         else: return self.endJob('No build script found!', failed=True)
         #@TODO Add test script?
         self.msg('Packaging build results... ')
-        os.chdir('..')
         name = "%s_%s_%s_%s.tar.gz" % (platform.machine().lower(), platform.system().lower(), self.pid, self.id)
         if not self.open("tar -zcvf %s output" % (name)):
             self.msg('[FAILED]', True)
             return self.endJob('Could not package build results!', failed=True)
         self.endJob('Build #%s of %s built with 0 errors!' % (self.id, self.pid), out=name)
-        os.chdir('..')
+        
 
 def main():
     red = redis.Redis('hydr0.com')
