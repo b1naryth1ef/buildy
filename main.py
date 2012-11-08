@@ -73,6 +73,7 @@ def adminView():
 @app.route('/api/<action>', methods=['POST'])
 def apiRoute(action=None):
     if action == 'put_build':
+        print 'Got build push!'
         p = Project.get(Project.id==int(request.form.get('pid')))
         q = [i for i in Build.select().where((Build.build_id == request.form.get('id')) & (Build.built==False) & (Build.project==p))]
         if not len(q): return
