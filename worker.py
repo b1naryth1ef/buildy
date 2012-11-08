@@ -95,9 +95,9 @@ def main():
     while True:
         build = red.blpop(['buildy.builds', 'buildy.sys.%s' % platform.system().lower(), 'buildy.arch.%s' % platform.machine().lower()])
         try:
-            build = json.loads(build)
+            build = json.loads(build[1])
         except:
-            print 'Could not load json data: %s' % build
+            print 'Could not load json data: %s' % str(build)
             continue
         b = BuildJob(build['id'], build['pid'], build['git'])
         thread.start_new_thread(b.startJob, ())
