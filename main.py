@@ -101,7 +101,7 @@ def apiRoute(action=None):
                     project=q[0],
                     info=i['message'],
                     author=i['author']['name'],
-                    url=i['url'],
+                    url='http://git.'+i['url'],
                     sha=i['id'][:6])
                 c.save()
                 commits.append(c)
