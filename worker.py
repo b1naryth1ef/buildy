@@ -78,12 +78,14 @@ class BuildJob():
             self.msg('[DONE]', True)
         if os.path.exists('cleanup.sh'):
             self.msg('Found cleanup script, running it... ')
+            self.open('chmod +x cleanup.sh')
             if not self.open('./cleanup.sh'):
                 self.msg('[FAILED]', True)
                 return self.endJob('Cleanup script failed!', failed=True)
             self.msg('[DONE]', True)
         if os.path.exists('build.sh'):
             self.msg('Found build script, running it... ')
+            self.open('chmod +x build.sh')
             if not self.open('./build.sh'):
                 self.msg('[FAILED]', True)
                 return self.endJob('Build script failed!', failed=True)
