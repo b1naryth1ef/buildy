@@ -89,7 +89,7 @@ def apiRoute(action=None):
 
     if action == 'gitlab':
         d = request.json
-        q = [i for i in Project.select().where((Project.repo_name==request.json['repository']['name']) &(Project.active==True))]
+        q = [i for i in Project.select().where((Project.repo_name==request.json['repository']['name'].lower()) &(Project.active==True))]
         if len(q):
             commits = []
             for i in request.json['commits']:
@@ -144,7 +144,7 @@ def adminActionRoute(action=None, id=None):
             desc=request.form.get('pdesc'),
             url=request.form.get('purl'),
             repo_type=request.form.get('repotype'),
-            repo_name=request.form.get('pgitname'),
+            repo_name=request.form.get('pgitname').lower(),
             repo_url=request.form.get('giturl'))
         p.save()
         return flashy('/admin', 'Added project "%s" (ID #%s)' % (p.name, p.id), 'success')
