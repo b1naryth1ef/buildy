@@ -82,8 +82,7 @@ def apiRoute(action=None):
         f = request.files.get('build')
         if not f or not f.filename.endswith('.tar.gz'):
             print "Invalid file!"
-            return
-        b.build_url = 'http://'+saveBuild(b, f)
+            b.build_url = 'http://'+saveBuild(b, f)
         b.save()
 
     if action == 'gitlab':
