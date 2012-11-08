@@ -18,9 +18,14 @@ class Project(BaseModel):
     author = ForeignKeyField(User, related_name="projects")
     desc = CharField()
     url = CharField()
+    repo_type = CharField()
     repo_name = CharField()
-    config = CharField()
+    repo_url = CharField()
+    config = CharField(default="")
     active = BooleanField(default=True)
+
+    def getBuildId(self):
+        return Build.select().aggregate((Build.project==self) & fn.Max(Build.id))
 
     def getFails(self, l=False):
         q = [i for i in Build.select().where((Build.project==self) & (Build.success == False) & (Build.built == True))]
@@ -40,6 +45,7 @@ class Project(BaseModel):
 
     def getpc(self):
         builds = [i for i in Build.select().where((Build.project==self) & (Build.built == True))]
+        if not len(builds): return 0, 0
         winpc = 100*(len([i for i in builds if i.success == True]))/(len(builds))
         failpc = 100*(len([i for i in builds if i.success == False]))/(len(builds))
         return winpc, failpc
@@ -86,7 +92,7 @@ if __name__ == '__main__':
     if not len([i for i in User.select()]):
         u = User(username="root", password=bcrypt.hashpw('admin', bcrypt.gensalt()))
         u.save()
-        m = Project(name='Test', author=u, desc="This is a test", url="http://google.com/", repo_name="test", config="")
+        m = Project(name='Test', author=u, desc="This is a test", url="http://google.com/", repo_name="test", repo_type="gl")
         m.save()
         c = Commit(project=m, info="Updated blah and fixed blah. Represents version 3.5.", sha="589daj93sd93jsdf", author="B1naryTh1ef", url="http://test.com/")
         c.save()

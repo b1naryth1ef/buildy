@@ -69,7 +69,39 @@ def adminView():
 
 # ROUTES (post calls)
 @app.route('/api/<action>', methods=['POST'])
-def apiRoute(): pass
+def apiRoute(action=None):
+    if action == 'put_build':
+        print request.form
+    if action == 'gitlab':
+        d = request.json
+        q = [i for i in Project.select().where((Project.repo_name==request.json['repository']['name']) &(Project.active==True))]
+        if len(q):
+            f = request.json['commits']
+            if len(f) > 1: #@TODO fix this maybs?
+                url = '/'.join(f[-1]['url'].replace('http://hydr0.com', '').split('/')[:-1])
+                url = url + '/compare?from=%s&to=%s' % (f[0]['id'], f[-1]['id'])
+                sha = '%s...%s' % (f[0]['id'][:9], f[-1]['id'][:9]) 
+            else:
+                url = f[-1]['url'].split('http://hydr0.com')[-1]
+                sha = f[-1]['id'][:9]
+            c = Commit(
+                project=q[0],
+                info=f[-1]['message'],
+                author=f[-1]['author']['name'],
+                url=url,
+                sha=sha)
+            c.save()
+
+            b = Build(
+                project=q[0],
+                commit=c,
+                build_id=q[0].getBuildId(),
+                built=False,
+                time=datetime.now())
+            b.save()
+            runBuild(b)
+        else:
+            print 'Invalid build info!', d, q
 
 @app.route('/admin_action/<action>', methods=['POST'])
 @app.route('/admin_action/<action>/<id>')
@@ -78,7 +110,7 @@ def adminActionRoute(action=None, id=None):
         return flashy('/', 'You must be logged in to do that!', 'error')
     if not action:
         return flashy('/', 'There was an error processing your request!', 'error')
-    if not request.form.get('isact') and not id or not id.isdigit():
+    if not request.form.get('isact') and not id or id and not id.isdigit(): #Best ifstatement EVAR
         return flashy('/', 'Invalid or maliformed request!', 'error')
     if action == 'delete_proj':
         q = [i for i in Project.select().where(Project.id == int(id))]
@@ -86,6 +118,19 @@ def adminActionRoute(action=None, id=None):
             return flashy('/', 'Invalid Project ID (%s)' % id, 'error')
         q[0].delete_instance()
         return flashy('/', 'Deleted Project #%s!' % id, 'success')
+    elif action == 'add_proj':
+        q = [i for i in Project.select().where(Project.name == request.form.get('pname'))]
+        if len(q): return flashy('/admin', 'There is already a project with the name "%s"' % request.form.get('pname'), 'error')
+        p = Project(
+            name=request.form.get('pname'),
+            author=User.get(User.id==session.get('uid')),
+            desc=request.form.get('pdesc'),
+            url=request.form.get('purl'),
+            repo_type=request.form.get('repotype'),
+            repo_name=request.form.get('pgitname'),
+            repo_url=request.form.get('giturl'))
+        p.save()
+        return flashy('/admin', 'Added project "%s" (ID #%s)' % (p.name, p.id), 'success')
 
 @app.route('/login', methods=['POST'])
 def loginRoute():
@@ -96,39 +141,23 @@ def loginRoute():
         return flashy('/', 'No such user with that name!', 'error')
     if bcrypt.hashpw(request.form.get('pw'), q[0].password) == q[0].password:
         session['logged'] = True
+        session['uid'] = q[0].id
         return flashy('/', 'You have been logged in!', 'success')
     return flashy('/', 'Invalid password!', 'error')
 
 @app.route('/logout')
 def logoutRoute():
     del session['logged']
+    del session['uid']
     return flashy('/', 'You have been logged out!', 'success')
 
-# @app.route('/project/<pid>/')
-# def projectView(pid=None):
-#     if pid and pid.isdigit() or isinstance(pid, int):
-#         q = [i for i in Project.select().where(id=int(pid))]
-#         if len(q):
-#             v = Obby()
-#             v.stats = getStats()
-#             v.title = "%s" % q[0].name
-#             v.builds = list(reversed([i for i in Build.select().where(project=q[0])]))
-#             return render_template('project.html', p=q[0], v=v)
-#         else: flash('No project with ID #%s' % pid)
-#     else: flash('The project ID is invalid!')
-#     return redirect(url_for('index'))
-
-# def runBuild(b):
-#     print 'Adding build to queue!'
-#     info = json.dumps({
-#         'projid':b.project.id,
-#         'dir':b.project.name,
-#         'bid':b.bnum,
-#         'jobid':b.id,
-#         'bcode':b.code
-#         })
-#     for i in ['buildy.jobs', 'buildy.arch.*', 'buildy.sys.*']:
-#         REDIS.publish(i, info)
+def addBuild(b):
+    info = json.dumps({
+            'pid':b.project.id,
+            'id':b.id,
+            'git':b.project.repo_url})
+    REDIS.rpush('buildy.builds', info)
+    print 'Pushed build #%s' % b.id
 
 # def saveBuild(b, f):
 #     proj_dir = os.path.join(BUILD_DIR, b.project.name)
@@ -137,18 +166,6 @@ def logoutRoute():
 #     if not os.path.exists(build_dir): os.mkdir(build_dir)
 #     f.save(os.path.join(build_dir, f.filename))
 #     return os.path.join(THIS_URL, 'builds', b.project.name, str(b.bnum))
-
-# def findStalled():
-#     q = [i for i in Build.select().where(finished=False) if time.time()-i.created >= 600]
-#     if len(q):
-#         print "Removing %s stalled builds!" % len(q)
-#         for i in q:
-#             i.finished = True
-#             i.success = False
-#             i.result = "Build timed out!"
-#             i.project.b_fail += 1
-#             i.project.save()
-#             i.save()
 
 # @app.route('/api/<action>/', methods=['POST'])
 # def api(action=None):

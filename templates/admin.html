@@ -7,107 +7,86 @@
                 <h2>Admin</h2>
             </header>
             <section>
-                <p>The following is a set of projects that are hosted on this build bot. Each project displays both the successfull and failed builds over the course of its existance in our database. </p>
-                 <a class="btn btn-alt btn-primary btn-block" data-toggle="modal" href="#addModal"><span class="fam-add"></span>Add Project</a>
+                <p>Setup projects, manage builds, list workers, and more admin stuffs.</p>
             </section>
         </div>
     </article>
 </div>
-<div class="modal fade" id="addModal">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h3>Add Project</h3>
-    </div>
-    <div class="modal-body">
-        <form class="form-inline" >
-         <form class="form-horizontal" action="/admin_action/add_proj" method="post">
-            <fieldset>
-                <legend>Horizontal form</legend>
-                <div class="control-group">
-                    <label class="control-label" for="input">Text input</label>
-                    <div class="controls">
-                        <input id="input" class="input-xxlarge" type="text">
-                        <p class="help-block">Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+
+<div class="row-fluid">
+    <article class="span12 data-block nested">
+        <div class="data-container">                       
+            <div id="accordion1" class="accordion">
+                <div class="accordion-group">
+                    <div class="accordion-heading">
+                        <a class="accordion-toggle collapsed" style="text-align: center;" href="#collapseOne" data-parent="#accordion1" data-toggle="collapse"> Add Project <span class="caret"></span></a>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="optionsCheckbox">Checkbox</label>
-                    <div class="controls">
-                        <label class="checkbox">
-                            <input id="optionsCheckbox" type="checkbox" value="option1">
-                            Curabitur vehicula porttitor suscipit
-                        </label>
+                    <div id="collapseOne" class="accordion-body collapse" style="height: 0px; ">
+                        <div class="accordion-inner">         
+                            <form class="form-horizontal" action="/admin_action/add_proj" method="post">
+                                <input type="hidden" name="isact" value="1" /><!-- We use this to track POST requests on the backend -->
+                                <fieldset>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input">Project Name</label>
+                                        <div class="controls">
+                                            <input id="input" class="input-xxlarge" type="text" name="pname">
+                                            <p class="help-block">The name of the project. Its usually best to keep this the same as git (all though its not required)</p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input">Project URL</label>
+                                        <div class="controls">
+                                            <input id="input" class="input-xxlarge" type="text" name="purl">
+                                            <p class="help-block">The URL of the project. Can be a GL/GH url, or a public webpage.</p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input">Git Name</label>
+                                        <div class="controls">
+                                            <input id="input" class="input-xxlarge" type="text" name="pgitname">
+                                            <p class="help-block">The name of the git repository (Must be exact, this is used for post-recieve urls).</p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input">Project URL</label>
+                                        <div class="controls">
+                                            <input id="input" class="input-xxlarge" type="text" name="giturl">
+                                            <p class="help-block">The git SSH url, something like <code>git@blah.com:mygit.blah</code></p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="textarea">Project Description</label>
+                                        <div class="controls">
+                                            <textarea id="textarea" class="input-xxlarge" rows="5" name="pdesc"></textarea>
+                                            <p class="help-block">An overview or description of the project (helps users understand projects)</p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="optionsRadios">Project Git Type</label>
+                                        <div class="controls">
+                                            <label class="radio inline">
+                                                <input type="radio" name="repotype" id="optionsRadios1" value="gl" checked="">
+                                                Gitlab
+                                            </label>
+                                            <label class="radio inline">
+                                                <input type="radio" name="repotype" id="optionsRadios2" value="gh">
+                                                Github
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button class="btn btn-alt btn-large btn-primary" type="submit">Add Project</button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="optionsRadios">Radio</label>
-                    <div class="controls">
-                        <label class="radio">
-                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked="">
-                            Option one is this and that—be sure to include why it's great
-                        </label>
-                        <label class="radio">
-                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                            Option two can be something else and selecting it will deselect option one
-                        </label>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="inlineCheckbox">Inline checkbox</label>
-                    <div class="controls">
-                        <label class="checkbox inline">
-                            <input type="checkbox" id="inlineCheckbox1" value="option1"> 1
-                        </label>
-                        <label class="checkbox inline">
-                            <input type="checkbox" id="inlineCheckbox2" value="option2"> 2
-                        </label>
-                        <label class="checkbox inline">
-                            <input type="checkbox" id="inlineCheckbox3" value="option3"> 3
-                        </label>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="select">Select list</label>
-                    <div class="controls">
-                        <select id="select">
-                            <option>Google</option>
-                            <option>Apple</option>
-                            <option>Samsung</option>
-                            <option>Intel</option>
-                            <option>Microsoft</option>
-                            <option>Facebook</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="selectMultiple">Multiple select list</label>
-                    <div class="controls">
-                        <select id="selectMultiple" multiple="multiple">
-                            <option>Google</option>
-                            <option>Apple</option>
-                            <option>Samsung</option>
-                            <option>Intel</option>
-                            <option>Microsoft</option>
-                            <option>Facebook</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="textarea">Textarea</label>
-                    <div class="controls">
-                        <textarea id="textarea" class="input-xxlarge" rows="5"></textarea>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button class="btn btn-alt btn-large btn-primary" type="submit">Save changes</button>
-                </div>
-            </fieldset>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <a href="#" class="btn btn-alt" data-dismiss="modal">Close</a>
-    </div>
+                </div>           
+            </div>
+        </div>
+    </article>
 </div>
+
 {% endblock %}
 
 
