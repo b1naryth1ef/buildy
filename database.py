@@ -92,7 +92,7 @@ if __name__ == '__main__':
     if not len([i for i in User.select()]):
         u = User(username="root", password=bcrypt.hashpw('admin', bcrypt.gensalt()))
         u.save()
-        m = Project(name='Test', author=u, desc="This is a test", url="http://google.com/", repo_name="test", repo_type="gl")
+        m = Project(name='Test', author=u, desc="This is a test", url="http://google.com/", repo_name="test", repo_type="gl", repo_url="git@test.com:git.git")
         m.save()
         c = Commit(project=m, info="Updated blah and fixed blah. Represents version 3.5.", sha="589daj93sd93jsdf", author="B1naryTh1ef", url="http://test.com/")
         c.save()
