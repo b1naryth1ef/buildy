@@ -46,7 +46,7 @@ class BuildJob():
         else:
             print '--> BUILD SUCCESS <--'
             files = {'build':out}
-        requests.post('http://'+main_addr+'/api/put_build',
+        r = requests.post('http://'+main_addr+'/api/put_build',
             files=files,
             data={
                 'pid':self.pid, 
@@ -55,6 +55,7 @@ class BuildJob():
                 'result':'\n'.join(self.result), 
                 'output':'\n'.join(self.output),
                 'time':"%s" % (time.time()-self.startTime)})
+        print 'Posted build: %s' % r.status_code
         os.chdir('../..')
     
     def startJob(self):

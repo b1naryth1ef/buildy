@@ -75,7 +75,6 @@ def apiRoute(action=None):
     if action == 'put_build':
         p = Project.get(Project.id==int(request.form.get('pid')))
         q = [i for i in Build.select().where((Build.build_id == request.form.get('id')) & (Build.built==False) & (Build.project==p))]
-        print p, q, request.form.get('id')
         if not len(q): return 'Error!'
         b = q[0]
         b.built = True
