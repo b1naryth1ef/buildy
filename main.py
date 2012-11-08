@@ -76,8 +76,9 @@ def apiRoute(action=None):
         q = [i for i in Build.select().where((Build.build_id == request.form.get('id')) & (Build.built==False) & (Build.project==p))]
         if not len(q): return
         b = q[0]
+        b.built = True
         b.success = bool(int(request.form.get('success')))
-        b.result = request.form.get('result')
+        b.result = request.form.get('result').replace('\n', '<br />')
         b.finish_time = datetime.now()
         f = request.files.get('build')
         if not f or not f.filename.endswith('.tar.gz'):

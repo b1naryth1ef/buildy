@@ -69,7 +69,7 @@
                                     <dd><strong>{{ b.commit.sha }}</strong></dd>
                                 </dl>
                                 <h5>Result: </h5>
-                                <p>{{ b.result }}</p>
+                                <p>{{ b.result|safe }}</p>
                                 <a href="#" data-toggle="collapse" data-target="#build{{ loop.index }}" class="btn btn-alt">Close</a>
                             </div>
                         </li>
