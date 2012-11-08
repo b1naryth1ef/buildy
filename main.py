@@ -100,7 +100,7 @@ def apiRoute(action=None):
                 built=False,
                 time=datetime.now())
             b.save()
-            runBuild(b)
+            addBuild(b)
         else:
             print 'Invalid build info!', d, q
 
