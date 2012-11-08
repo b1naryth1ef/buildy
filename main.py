@@ -79,9 +79,9 @@ def apiRoute(action=None):
         if len(q):
             commits = []
             for i in request.json['commits']:
-                q = [i for i in Commit.select().where((Commit.sha==i['id'][:6]))]
-                if len(q):
-                    commits.append(q[0])
+                com = [i for i in Commit.select().where((Commit.sha==i['id'][:6]))]
+                if len(com):
+                    commits.append(com[0])
                     continue
                 c = Commit(
                     project=q[0],
