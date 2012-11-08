@@ -1,6 +1,0 @@
-<ul>
-        <p>Project - Build # - Passed<p>
-    {% for build in builds %}
-        <li>{{ projects[build.project].name }} - <a href="/project/{{ build.project }}/builds/{{ build.bid }}">#{{ build.bid }}</a> - {{ build.success }}</li>
-    {% endfor %}
-</ul>

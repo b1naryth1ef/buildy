@@ -1,38 +1,130 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="widget">
-    <div class="title"><img src="/static/images/icons/dark/list.png" alt="" class="titleIcon" /><h6>Project: {{ p.name }}</h6></div>
-    <p>{{ p.desc }}</p>
+<div class="row-fluid">
+    <article class="span12 data-block">
+        <div class="data-container">
+            <header>
+                <h2>Project :: {{ v.proj.name }}</h2>
+                
+            </header>
+            <section>
+                <h4>Author: {{ v.proj.author.username }}</h2>
+                <p>{{ v.proj.desc }}</p>
+            </section>
+        </div>
+    </article>
 </div>
-{% block stats %} {% endblock %}
-<div class="widget">
-    <div class="title"><img src="/static/images/icons/dark/stats.png" alt="" class="titleIcon" /><h6>Projects</h6></div>
-    <table cellpadding="0" cellspacing="0" width="100%" class="sTable">
-        <thead>
-            <tr>
-                <td>Build #</td>
-                <td>Commit</td>
-                <td>Pusher</td>
-                <td>Info</td>
-                <td>Success/Failure</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for i in v.builds %}
-                <tr>
-                    <td align="center">
-                        <a href="{% if i.success %}{{ i.burl }}{% else %}#{%endif%}" title="" class="webStatsLink">{{ i.bnum }}</a>
-                    </td>
-                    <td align="center"><a href="http://git.hydr0.com/{{ i.commit.url }}">{{ i.commit.sha }}</a></td>
-                    <td align="center">{{ i.commit.by }}</td>
-                    <td align="center">{% if i.success %} {{ i.commit.info }} {% else %} {{ i.result }} {% endif %}</td>
-                    <td align="center">{% if i.success %}Build completed in {{ i.time }}s{% else %}Build failed!{% endif %}</td>
-                    
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>    
-</div>
+<div class="row-fluid">
+    <article class="span12 data-block nested">
+        <div class="data-container">
+            <header>
+                <h2>Builds</h2>
+            </header>
+            <section>
+                <ul id="builds" class="tickets">
+                    <li class="ticket-header">
+                        <ul>
+                            <li class="ticket-header-ticket">Build ID</li>
+                            <li class="ticket-header-activity">Commit</li>
+                            <li class="ticket-header-priority">Result</li>
+                            <li class="ticket-header-age">Age</li>
+                            <li class="ticket-header-user">Download</li>
+                        </ul>
+                    </li>
+                    {% for b in v.proj.builds %}
+                        <li class="ticket-data">
+                            <div class="ticket-overview">
+                                <ul>
+                                    <li class="ticket-data-label">#{{ b.id }}</li>
+                                    <li class="ticket-data-activity">
+                                        <a href="#" data-toggle="collapse" data-parent="#build" data-target="#build{{ loop.index }}">{{ b.commit.info }}</a>
+                                        <p>{{ b.commit.author }}</p>
+                                    </li>
+                                    <li class="ticket-data-priority">
+                                        {% if b.built %}
+                                            {% if b.success %}
+                                                <span class="label label-success">Succeeded!</span>
+                                            {% else %}
+                                                <span class="label label-important">Failed!</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="label label-warning">Unbuilt!</span>
+                                        {% endif %}
+                                    </li>
 
+                                    <li class="ticket-data-age">16 hours</li>
+                                    <li class="ticket-data-user"><strong><a class="btn btn-success btn-small" href="{{ b.build_url }}">Downlaod</a></strong>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="ticket-details collapse fade" id="build{{ loop.index }}">
+                                <dl>
+                                    <dt>Created:</dt>
+                                    <dd><strong>{{ b.getCreated() }}</strong></dd>
+                                    <dt>Finished:</dt>
+                                    <dd><strong>{{ b.getFinished() }}</strong></dd>
+                                    <dt>Pushed By:</dt>
+                                    <dd><strong>{{ b.commit.author }}</strong></dd>
+                                    <dt>Commit SHA:</dt>
+                                    <dd><strong>{{ b.commit.sha }}</strong></dd>
+                                </dl>
+                                <h5>Result: </h5>
+                                <p>{{ b.result }}</p>
+                                <a href="#" data-toggle="collapse" data-target="#build{{ loop.index }}" class="btn btn-alt">Close</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </article>
+</div>
+<div class="row-fluid">
+    <article class="span4 data-block nested">
+        <div class="data-container">
+            <header>
+                <h2>Build Stats</h2>
+            </header>
+            <section>
+                <ul class="stats">
+                    <li>
+                        <strong class="stats-count">{{ v.proj.getTotal() }}</strong>
+                        <p>Successfull Builds</p>
+                    </li>
+                    <li>
+                        <strong class="stats-count">{{ v.proj.getWins(True) }}</strong>
+                        <p>Successfull Builds</p>
+                    </li>
+                    <li>
+                        <strong class="stats-count">{{ v.proj.getFails(True) }}</strong>
+                        <p>Failed Builds</p>
+                    </li>
+                    <li>
+                        <strong class="stats-count">{{ v.proj.getUnbuilt() }}</strong>
+                        <p>Unbuilt Builds</p>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </article>
+    <article class="span8 data-block nested">
+        <div class="data-container">
+            <header>
+                <h2>Git Commits</h2>
+            </header>
+            <section>
+                {% for comm in v.proj.commits %}
+                <div class="entry">
+                    <h4 class="entry-header"><span class="awe-github"></span> {{ comm.info }} -- <code>{{ comm.author }}</code><time><a href="{{ comm.url }}"><em>{{ comm.getShort() }}</em></time></h4>
+                </div>
+                {% endfor %}             
+            </section>
+        </div>
+    </article>
 </div>
 {% endblock %}
+
+
+
+            
+        

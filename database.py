@@ -1,4 +1,7 @@
 from peewee import *
+import bcrypt
+from datetime import datetime
+from utils import niceDate
 
 database = SqliteDatabase('data.db', threadlocals=True)
 
@@ -6,46 +9,88 @@ class BaseModel(Model):
     class Meta:
         database = database
 
+class User(BaseModel):
+    username = CharField()
+    password = CharField()
+
 class Project(BaseModel):
-    name = CharField(null=True)
-    repo_name = CharField(null=True)
-    git = CharField(null=True)
-    b_win = IntegerField(null=True)
-    b_fail = IntegerField(null=True)
-    desc = CharField(null=True)
-    active = BooleanField(null=True)
+    name = CharField()
+    author = ForeignKeyField(User, related_name="projects")
+    desc = CharField()
+    url = CharField()
+    repo_name = CharField()
+    config = CharField()
+    active = BooleanField(default=True)
+
+    def getFails(self, l=False):
+        q = [i for i in Build.select().where((Build.project==self) & (Build.success == False) & (Build.built == True))]
+        if l: return len(q)
+        return q
+
+    def getWins(self, l=False):
+        q = [i for i in Build.select().where((Build.project==self) & (Build.success == True) & (Build.built == True))]
+        if l: return len(q)
+        return q
+
+    def getTotal(self):
+        return len([i for i in Build.select().where(Build.project==self)])
+
+    def getUnbuilt(self):
+        return len([i for i in Build.select().where((Build.project==self) & (Build.built == False))])
+
+    def getpc(self):
+        builds = [i for i in Build.select().where((Build.project==self) & (Build.built == True))]
+        winpc = 100*(len([i for i in builds if i.success == True]))/(len(builds))
+        failpc = 100*(len([i for i in builds if i.success == False]))/(len(builds))
+        return winpc, failpc
 
 class Commit(BaseModel):
+    project = ForeignKeyField(Project, related_name="commits")
     info = CharField(null=True)
     sha = CharField(null=True)
-    by = CharField(null=True)
+    author = CharField(null=True)
     url = CharField(null=True)
 
+    def getShort(self):
+        return self.sha[:6]
+
 class Build(BaseModel):
-    project = ForeignKeyField(Project, "builds")
-    commit = ForeignKeyField(Commit, "builds")
+    project = ForeignKeyField(Project, related_name="builds")
+    commit = ForeignKeyField(Commit, related_name="builds")
     result = CharField(null=True)
-    bnum = IntegerField(null=True)
-    burl = CharField(null=True)
-    code = IntegerField(null=True)
-    finished = BooleanField(null=True)
-    success = BooleanField(null=True)
-    downloads = IntegerField(null=True)
-    time = CharField(null=True)
-    created = IntegerField(null=True)
+    build_id = IntegerField(default=0)
+    build_url = CharField(null=True)
+
+    built = BooleanField(default=False)
+    success = BooleanField(default=False)
+    time = DateTimeField()
+    finish_time = DateTimeField(null=True)
+
+    def getCreated(self):
+        if self.time:
+            return niceDate(self.time)+" ago"
+
+    def getFinished(self):
+        if self.finish_time:
+            return niceDate(self.finish_time)+" ago"
+        return 'Unfinished'
 
 def createStuffz():
+    User.create_table(True)
     Project.create_table(True)
     Commit.create_table(True)
     Build.create_table(True)
 
-def addProjects():
-    if not len([i for i in Project.select().where(name='2D2')]):
-        Project.create(name="2D2", repo_name="neeks_engine", desc="2DEngine2 is a game and gui engine written by neek", git="git@hydr0.com:neeks_engine.git", b_win=0, b_fail=0, active=True)
-    if not len([i for i in Project.select().where(name="B1nGoLib")]):
-        Project.create(name="B1nGoLib", repo_name="B1nGoLib", desc="A Go library I use to store snippets of code I need or use frequently", git="git@hydr0.com:b1ngolib.git", b_win=0, b_fail=0, active=True)
-
-
 if __name__ == '__main__':
     createStuffz()
-    addProjects()
+    if not len([i for i in User.select()]):
+        u = User(username="root", password=bcrypt.hashpw('admin', bcrypt.gensalt()))
+        u.save()
+        m = Project(name='Test', author=u, desc="This is a test", url="http://google.com/", repo_name="test", config="")
+        m.save()
+        c = Commit(project=m, info="Updated blah and fixed blah. Represents version 3.5.", sha="589daj93sd93jsdf", author="B1naryTh1ef", url="http://test.com/")
+        c.save()
+        b = Build(project=m, commit=c, build_id=0, build_url="http://google.com/buildy", built=True, success=True, time=datetime.now())
+        b.save()
+        b = Build(project=m, commit=c, build_id=1, build_url="http://google.com/buildy", built=True, success=False, time=datetime.now())
+        b.save()

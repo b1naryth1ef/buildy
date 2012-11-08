@@ -1,98 +1,81 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<!--[if IE 8]>    <html class="no-/static/js/ ie8 ie" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="no-/static/js/ ie9 ie" lang="en"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-/static/js/" lang="en"> <!--<![endif]-->
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-<title>{% block title %}Buildy -- {{ v.title }}{% endblock %}</title>
-<link href="/static/css/main.css" rel="stylesheet" type="text/css" />
-
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-
-<script type="text/javascript" src="/static/js/plugins/spinner/ui.spinner.js"></script>
-<script type="text/javascript" src="/static/js/plugins/spinner/jquery.mousewheel.js"></script>
-
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-
-<script type="text/javascript" src="/static/js/custom.js"></script>
-
+    <meta charset="utf-8">
+    <title>{% block title %}Hydr0 Buildy -- {{ v.title }}{% endblock %}</title>
+    <meta name="description" content="Hydr0.com's build bot of awesome">
+    <meta name="author" content="B1naryTh1ef">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- <link rel="stylesheet" href="/static/css/plugins/jquery.plupload.queue.css">
+    <link rel="stylesheet" href="/static/css/plugins/jquery.ui.plupload.css"> -->
+    
+    <link rel="stylesheet" href="/static/css/organon-blue.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/static/js/libs/jquery.js"><\/script>')</script>
+    <script src="/static/js/libs/modernizr.js"></script>
+    <script src="/static/js/libs/selectivizr.js"></script>
 </head>
-
-<body>
-
-<!-- Left side content -->
-<div id="leftSide">
-    <div class="logo"><a href="/"><img src="/static/images/buildy_logo.png" alt="" /></a></div>
-    <div class="sidebarSep mt0"></div>
-    <div class="numStats">
-        <ul>
-            <li>{{ v.stats.total_builds }}<span>builds</span></li>
-            <li>{{ v.stats.total_projects }}<span>projects</span></li>
-            <li class="last">{{ v.stats.total_downloads }}<span>downloads</span></li>
-        </ul>
-        <div class="clear"></div>
-    </div>
-    
-    <div class="sidebarSep"></div>
-    
-    <!-- Left navigation -->
-    <ul id="menu" class="nav">
-        <li class="dash"><a href="/" title="" class="active"><span>Home</span></a></li>
-        <li class="files"><a href="/builds/" title=""><span>Builds</span></a></li>
-    </ul>
-</div>
-
-<div id="rightSide">
-    <div class="titleArea">
-        <div class="wrapper">
-            <div class="pageTitle">
-                <h5>Buildy</h5>
-                <span>A build-bot for cool people!</span>
-            </div>
-            <div class="clear"></div>
-        </div>
-    </div>
-    
-    <div class="line"></div>
-    
-    <!-- Page statistics area -->
-    {% block stats %}
-    <div class="statsRow">
-        <div class="wrapper statsItems">
-            <div class="sItem ticketsStats">
-                <h2><a title="" class="value"><span class="positivey">{{ v.stats.total_win }}</span><span class="text">success</span></a></h2>
-            </div>
-            <div class="sItem visitsStats">
-                <h2><a title="" class="value"><span class="positivex">{{ v.stats.total_fail }}</span><span class="text">failures</span></a></h2>
-            </div>
-            <div class="sItem visitsStats">
-                <h2><a title="" class="value"><span class="positivez">{{ v.stats.total_building }}</span><span class="text">building</span></a></h2>
-            </div>
-        </div>
-    </div>
-    
-    <div class="line"></div>
-    {% endblock %}
-    <!-- Main content wrapper -->
-    <div class="wrapper">
-        <!-- Message/etc -->
-        {% with messages = get_flashed_messages() %}
+    <body>
+        {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="nNote nFailure hideit">
-                {% for message in messages %}
-                    <p>{{ message }}</p>
-                {% endfor %}
+                
+                {% for cat, message in messages %}
+                <div class="alert alert-{{ cat }} fade in">
+                    <button type="button" class="close" data-dismiss="alert"><span class="awe-remove-circle"></span></button>
+                    {{ message|safe }}
                 </div>
+                {% endfor %}
+                
             {% endif %}
-        {% endwith %}
-        {% block content %}
-        {% endblock %}
-    
-        <!-- Footer line -->
-        <div id="footer">
-            <div class="wrapper">Made by <a href="http://b1naryth1ef.com/">B1naryTh1ef</a> for <a href="http://urtdevs.urban-terror.info/">UrTDevs</a> | Open Source <a href="http://github.com/b1naryth1ef/buildy/">FTW!</a></div>
+        {% endwith %}   
         </div>
-    </div>
-</div>
-<div class="clear"></div>
-</body>
-</html>
+        <div class="container-fluid">
+            <div class="sidebar">
+                <h1 style="text-align: center">Buildy</h1>
+                <section class="sidebar-box" style="text-align: center">
+                    <h2>Hydr0's official BuildBot</h2>
+                    <p>Whenever we push code that needs compiling, Buildy automatically pulls the latest version from our private git repos, and compiles it (sometimes on multiple machines) here. This allows us to quickly track test our code, and allows for fast/simple deploys.</p>
+                </section>
+                <nav class="main-navigation" role="navigation">
+                    <ul>
+                        <li><a href="/" class="no-submenu"><span class="fam-house"></span>Dashboard</a></li>
+                        <li><a href="#" class="no-submenu"><span class="fam-application-form"></span>Projects<span class="badge badge-primary">{{ v.stat_total_projects }}</span></a></li>
+                        <li><a href="#" class="no-submenu"><span class="fam-chart-line"></span>Builds<span class="badge badge-primary">{{ v.stat_total_builds }}</span></a></li>
+                    </ul>
+                </nav>
+                {% if not v.loggedin %}
+                    <a class="btn btn-alt btn-primary btn-block" data-toggle="modal" href="#loginModal"><span class="fam-lock"></span>Login</a>
+                {% else %}
+                    <a class="btn btn-alt btn-primary btn-block" href="/logout"><span class="fam-lock"></span>Logout</a>
+                    <a class="btn btn-alt btn-primary btn-block" href="/admin"><span class="fam-wrench"></span>Admin</a>
+                {% endif %}
+            </div>
+            <div class="content-block" role="main">
+                {% block content %}{{ content }}{% endblock %}
+            </div>
+        <div class="modal fade" id="loginModal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h3>Login</h3>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline" action="/login" method="post">
+                  <input type="text" class="input-small" name="user" placeholder="Username">
+                  <input type="password" class="input-small" name="pw" placeholder="Password">
+                  <button type="submit" class="btn">Sign in</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-alt" data-dismiss="modal">Close</a>
+            </div>
+        </div>
+
+        <script src="/static/js/navigation.js"></script>
+        <script src="/static/js/bootstrap/bootstrap.js"></script>
+        
+
+    </body>
