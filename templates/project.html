@@ -60,7 +60,7 @@
                             <div class="ticket-details collapse fade" id="build{{ loop.index }}">
                                 <dl>
                                     <dt>Created:</dt>
-                                    <dd><strong>{{ b.getCreated() }}</strong></dd>
+                                    <dd><strong>{{ b.getCreated() }} ago</strong></dd>
                                     <dt>Duration:</dt>
                                     <dd><strong>{{ b.getDuration() }}</strong></dd>
                                     <dt>Pushed By:</dt>
@@ -90,7 +90,7 @@
                 <ul class="stats">
                     <li>
                         <strong class="stats-count">{{ v.proj.getTotal() }}</strong>
-                        <p>Successfull Builds</p>
+                        <p>Total Builds</p>
                     </li>
                     <li>
                         <strong class="stats-count">{{ v.proj.getWins(True) }}</strong>

@@ -27,6 +27,7 @@ class BuildJob():
     def msg(self, msg, add=False):
         if not add:
             self.result.append(msg)
+            return 
         self.result[-1] = self.result[-1]+msg
 
     def open(self, cmd, **kwargs):

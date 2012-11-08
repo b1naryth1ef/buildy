@@ -82,11 +82,11 @@ class Build(BaseModel):
 
     def getCreated(self):
         if self.time:
-            return niceDate(self.time)+" ago"
+            return niceDate(self.time)
 
     def getFinished(self):
         if self.finish_time:
-            return niceDate(self.finish_time)+" ago"
+            return niceDate(self.finish_time)
         return 'Unfinished'
 
     def getDuration(self):
