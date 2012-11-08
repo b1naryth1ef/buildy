@@ -25,7 +25,10 @@ class Project(BaseModel):
     active = BooleanField(default=True)
 
     def getBuildId(self):
-        return Build.select().aggregate((Build.project==self) & fn.Max(Build.id))
+        q = [i.build_id for i in Build.select(Build.build_id).where((Build.project == self))]
+        if len(q):
+            return max(q)+1
+        return 1
 
     def getFails(self, l=False):
         q = [i for i in Build.select().where((Build.project==self) & (Build.success == False) & (Build.built == True))]
