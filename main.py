@@ -79,7 +79,10 @@ def apiRoute(action=None):
         if len(q):
             commits = []
             for i in request.json['commits']:
-                if len([i for i in Commit.select().where((Commit.sha==i['id'][:6]))]): continue
+                q = [i for i in Commit.select().where((Commit.sha==i['id'][:6]))]
+                if len(q):
+                    commits.append(q[0])
+                    continue
                 c = Commit(
                     project=q[0],
                     info=i['message'],
@@ -88,6 +91,9 @@ def apiRoute(action=None):
                     sha=i['id'][:6])
                 c.save()
                 commits.append(c)
+            if not len(commits):
+                print 'No commits?', d
+                return ':3'
             b = Build(
                 project=q[0],
                 commit=commits[-1],

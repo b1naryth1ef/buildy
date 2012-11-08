@@ -50,6 +50,7 @@ class BuildJob():
                 'success':int(self.success), 
                 'result':'\n'.join(self.results), 
                 'time':"%s" % (time.time()-self.start)})
+        os.chdir('../..')
 
     def startJob(self):
         if not os.path.exists(self.tmpdir):
