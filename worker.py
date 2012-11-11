@@ -99,7 +99,7 @@ class BuildJob():
         if not self.open("tar -zcvf %s output" % (name)):
             self.msg('[FAILED]', True)
             return self.endJob('Could not package build results!', failed=True)
-        self.endJob('Build #%s of %s built with 0 errors!' % (self.id, self.pid), out=name)
+        self.endJob('Build #%s of %s built with 0 errors!' % (self.id, self.pid), out=os.path.join('.', name))
         
 
 def main():

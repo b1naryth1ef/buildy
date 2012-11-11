@@ -171,7 +171,7 @@ def logoutRoute():
 def addBuild(b):
     info = json.dumps({
             'pid':b.project.id,
-            'id':b.id,
+            'id':b.build_id,
             'git':b.project.repo_url})
     REDIS.rpush('buildy.builds', info)
     print 'Pushed build #%s' % b.id
