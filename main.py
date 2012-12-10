@@ -87,6 +87,39 @@ def apiRoute(action=None):
         else: b.build_url = 'http://'+saveBuild(b, f)
         b.save()
 
+    if action == "github":
+        d = request.json
+        q = [i for i in Project.select().where((Project.repo_name==d['repository']['name'].lower()) &(Project.active==True))]
+        if len(q):
+            commits = []
+            for i in d['commits']:
+                com = [i for i in Commit.select().where((Commit.sha==i['id'][:6]))]
+                if len(com):
+                    commits.append(com[0])
+                else:
+                    c = Commit(
+                        project=q[0],
+                        info=i['message'],
+                        author=i['author']['name'],
+                        url=i['url'],
+                        sha=i['id'][:6])
+                    c.save()
+                    commits.append(c)
+
+            if not len(commits):
+                print "No commits! %s" % d
+                return 'Hi :3'
+            b = Build(
+                project=q[0],
+                commit=commits[-1],
+                build_id=q[0].getBuildId(),
+                built=False,
+                time=datetime.now())
+            b.save()
+            addBuild(b)
+        else:
+            print 'Invalid build info! %s' % d
+
     if action == 'gitlab':
         d = request.json
         q = [i for i in Project.select().where((Project.repo_name==request.json['repository']['name'].lower()) &(Project.active==True))]
