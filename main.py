@@ -89,6 +89,7 @@ def apiRoute(action=None):
 
     if action == "github":
         d = request.json
+        print d
         q = [i for i in Project.select().where((Project.repo_name==d['repository']['name'].lower()) &(Project.active==True))]
         if len(q):
             commits = []
