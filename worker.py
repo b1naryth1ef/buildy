@@ -1,7 +1,6 @@
 import sys, os, time
 import socket, json, thread, urllib2, platform
 import requests, subprocess, redis
-import popen2
 from collections import deque
 
 acpt_addr = ['127.0.0.1']

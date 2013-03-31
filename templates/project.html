@@ -37,7 +37,7 @@
                                 <ul>
                                     <li class="ticket-data-label">#{{ b.id }}</li>
                                     <li class="ticket-data-activity">
-                                        <a href="#" data-toggle="collapse" data-parent="#build" data-target="#build{{ loop.index }}">{{ b.commit.info }}</a>
+                                        <a data-toggle="collapse" data-parent="#build" data-target="#build{{ loop.index }}">{{ b.commit.info }}</a>
                                         <p>{{ b.commit.author }}</p>
                                     </li>
                                     <li class="ticket-data-priority">
