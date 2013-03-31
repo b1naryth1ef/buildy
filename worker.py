@@ -102,7 +102,7 @@ class BuildJob():
         
 
 def main():
-    red = redis.Redis('hydr0.com')
+    red = redis.Redis('hydr0.com', password=os.getenv("REDISPASS"))
     while True:
         build = red.blpop(['buildy.builds', 'buildy.sys.%s' % platform.system().lower(), 'buildy.arch.%s' % platform.machine().lower()])
         try:

@@ -10,7 +10,7 @@ app.secret_key = 'ads32304djlsf238mkndfi8320df'
 
 THIS_URL = "build.hydr0.com"
 BUILD_DIR = "/var/www/buildy/builds/"
-REDIS = redis.StrictRedis()
+REDIS = redis.StrictRedis(password=os.getenv("REDISPASS"))
 
 class Obj():
     def __init__(self, info={}):
